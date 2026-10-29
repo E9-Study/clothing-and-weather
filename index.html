@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Let's Practice the Clothing! - ESL Weather Dress-Up Game</title>
+  <title>Let's Practice Our Clothing! - Weather Dress-Up Game by Eri.9</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Kid-friendly rounded fonts -->
@@ -19,7 +19,7 @@
 
     body {
       font-family: var(--font-body);
-      user-select: none;
+      user-select: noneF;
       -webkit-user-select: none;
       overflow-x: hidden;
     }
@@ -286,7 +286,7 @@
           </svg>
         </div>
         <div>
-          <h1 class="font-kid text-base sm:text-xl font-bold text-gray-900 leading-tight">Clothes &amp; Weather ESL</h1>
+          <h1 class="font-kid text-base sm:text-xl font-bold text-gray-900 leading-tight">Clothes &amp; Weather Game by Eri.9</h1>
           <p class="text-[11px] text-gray-600 hidden xl:block">Learn vocabulary &amp; dress for the weather!</p>
         </div>
       </div>
@@ -2284,7 +2284,7 @@
       }
     }
 
-    // SCREEN 1: "Let's practice the clothing"
+    // SCREEN 1: "Let's practice our clothing"
     function renderVocabScreen(container, lvl) {
       const row1 = lvl.vocabItems.slice(0, 4);
       const row2 = lvl.vocabItems.slice(4, 8);
@@ -2343,7 +2343,7 @@
               </span>
               ${vocabReviewSubphase === 'repeat' ? `
                 <span class="px-2.5 py-0.5 rounded-full bg-emerald-200 border-2 border-gray-900 text-emerald-950 text-xs sm:text-sm font-black animate-pulse">
-                  Your turn! Say: "${currentItem.name}"
+                  Say: "${currentItem.name}"
                 </span>
               ` : `
                 <span class="px-2 py-0.5 rounded-full bg-sky-100 border border-sky-800 text-sky-900 text-xs font-bold">
@@ -2396,7 +2396,7 @@
         <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5 sm:mb-2">
           <div class="flex items-center gap-2">
             <h2 class="font-kid text-xl sm:text-3xl md:text-4xl font-bold text-gray-900 tracking-tight drop-shadow-sm">
-              Let’s practice the clothing
+              Let’s practice our clothing
             </h2>
           </div>
 
@@ -2442,7 +2442,7 @@
         <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-end">
           <!-- Left: Cheerful Girl Character (Matches Slide 1) -->
           <div class="hidden lg:flex lg:col-span-3 h-full items-end justify-center">
-            <div onclick="speakText('Let\\'s practice the clothing together!')" class="cursor-pointer w-full h-full flex items-end justify-center hover:scale-[1.02] transition-transform" title="Click me!">
+            <div onclick="speakText('Let\\'s practice our clothing together!')" class="cursor-pointer w-full h-full flex items-end justify-center hover:scale-[1.02] transition-transform" title="Click me!">
               ${renderSlide1HostGirlSVG()}
             </div>
           </div>

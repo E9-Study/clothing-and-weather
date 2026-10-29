@@ -1,0 +1,3166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Let's Practice the Clothing! - ESL Weather Dress-Up Game</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Kid-friendly rounded fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --font-display: 'Fredoka', sans-serif;
+      --font-body: 'Nunito', sans-serif;
+    }
+
+    body {
+      font-family: var(--font-body);
+      user-select: none;
+      -webkit-user-select: none;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, .font-kid {
+      font-family: var(--font-display);
+    }
+
+    /* Slide-authentic thick cartoon borders */
+    .cartoon-box {
+      border: 4px solid #111827;
+      box-shadow: 0 8px 0 rgba(17, 24, 39, 0.18);
+    }
+
+    .cartoon-pill {
+      border: 2.5px solid #111827;
+      box-shadow: 0 3px 0 #111827;
+      transition: all 0.15s ease;
+    }
+
+    .cartoon-pill:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #111827;
+    }
+
+    /* Animated Weather Elements */
+    @keyframes sunSpin {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.08); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+    .animate-sun {
+      animation: sunSpin 20s linear infinite;
+    }
+
+    @keyframes sunPulse {
+      0%, 100% { opacity: 0.45; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.18); }
+    }
+    .sun-glow {
+      animation: sunPulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes rainFall {
+      0% { transform: translateY(-40px) translateX(18px) rotate(16deg); opacity: 0; }
+      15% { opacity: 0.95; }
+      90% { opacity: 0.95; }
+      100% { transform: translateY(580px) translateX(-110px) rotate(16deg); opacity: 0; }
+    }
+    .raindrop {
+      animation: rainFall 0.85s linear infinite;
+    }
+
+    @keyframes puddleSplash {
+      0%, 100% { transform: scale(0.3); opacity: 0; }
+      50% { transform: scale(1.15); opacity: 0.85; }
+    }
+    .rain-splash {
+      animation: puddleSplash 0.85s ease-out infinite;
+    }
+
+    @keyframes snowFall {
+      0% { transform: translateY(-30px) translateX(0px) rotate(0deg); opacity: 0; }
+      15% { opacity: 1; }
+      50% { transform: translateY(270px) translateX(22px) rotate(180deg); opacity: 0.95; }
+      100% { transform: translateY(570px) translateX(-18px) rotate(360deg); opacity: 0.2; }
+    }
+    .snowflake {
+      animation: snowFall 3.1s linear infinite;
+      filter: drop-shadow(0 2px 3px rgba(15, 23, 42, 0.35));
+    }
+
+    @keyframes windFlow {
+      0% { transform: translateX(-60px) scaleX(0.92); opacity: 0.25; }
+      50% { transform: translateX(35px) scaleX(1.06); opacity: 0.95; }
+      100% { transform: translateX(110px) scaleX(0.95); opacity: 0.15; }
+    }
+    .wind-swirl {
+      animation: windFlow 2.1s ease-in-out infinite;
+    }
+
+    @keyframes leafBlow {
+      0% { transform: translate(-60px, 20px) rotate(0deg); opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { transform: translate(920px, -70px) rotate(540deg); opacity: 0; }
+    }
+    .wind-leaf {
+      animation: leafBlow 3.2s linear infinite;
+    }
+
+    @keyframes treeSway {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(4.5deg) translateX(8px); }
+    }
+    .tree-wind-sway {
+      transform-origin: bottom center;
+      animation: treeSway 1.8s ease-in-out infinite;
+    }
+
+    @keyframes cloudFloat {
+      0%, 100% { transform: translateX(-18px); }
+      50% { transform: translateX(26px); }
+    }
+    .cloud-drift {
+      animation: cloudFloat 4.2s ease-in-out infinite;
+    }
+
+    /* Character Weather & Feedback Reactions */
+    @keyframes shiverAnim {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px) rotate(-1.5deg); }
+      40% { transform: translateX(6px) rotate(1.5deg); }
+      60% { transform: translateX(-6px) rotate(-1.5deg); }
+      80% { transform: translateX(6px) rotate(1.5deg); }
+    }
+    .react-shiver {
+      animation: shiverAnim 0.28s ease-in-out infinite;
+    }
+
+    @keyframes sweatAnim {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(4px) scale(0.985, 1.015); }
+    }
+    .react-sweat {
+      animation: sweatAnim 0.9s ease-in-out infinite;
+    }
+
+    @keyframes rainDuckAnim {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(5px) rotate(-2deg); }
+    }
+    .react-rain {
+      animation: rainDuckAnim 0.75s ease-in-out infinite;
+    }
+
+    @keyframes windLeanAnim {
+      0%, 100% { transform: rotate(2deg) translateX(4px); }
+      50% { transform: rotate(6.5deg) translateX(12px); }
+    }
+    .react-wind {
+      transform-origin: bottom center;
+      animation: windLeanAnim 1.3s ease-in-out infinite;
+    }
+
+    @keyframes cloudyLookAnim {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-3px) rotate(-2.5deg); }
+    }
+    .react-cloudy {
+      animation: cloudyLookAnim 1.8s ease-in-out infinite;
+    }
+
+    @keyframes happyBounce {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-12px) scale(1.03); }
+    }
+    .react-happy {
+      animation: happyBounce 0.6s ease-in-out 3;
+    }
+
+    @keyframes thoughtPopIn {
+      0% { transform: scale(0.3) translateY(15px); opacity: 0; }
+      75% { transform: scale(1.06) translateY(-2px); opacity: 1; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    .thought-bubble-enter {
+      animation: thoughtPopIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      transform-origin: bottom left;
+    }
+
+    @keyframes popOn {
+      0% { transform: scale(0.6); opacity: 0; }
+      70% { transform: scale(1.08); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .clothing-layer-enter {
+      animation: popOn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      transform-origin: center center;
+    }
+
+    /* Guided Vocabulary Review Pulse Highlight */
+    @keyframes vocabPulseGlow {
+      0%, 100% { transform: scale(1.06); box-shadow: 0 0 0 4px #F59E0B, 0 10px 20px rgba(245, 158, 11, 0.35); }
+      50% { transform: scale(1.13); box-shadow: 0 0 0 8px #FBBF24, 0 14px 26px rgba(245, 158, 11, 0.5); }
+    }
+    .vocab-review-active {
+      animation: vocabPulseGlow 0.8s ease-in-out infinite;
+      background-color: #FEF3C7 !important;
+      z-index: 20;
+    }
+
+    /* Kawaii SVG Idle Breathing & Natural Blinking */
+    @keyframes kawaiiFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-4px); }
+    }
+    .kawaii-idle {
+      animation: kawaiiFloat 3.2s ease-in-out infinite;
+      will-change: transform;
+    }
+
+    @keyframes kawaiiBlink {
+      0%, 92%, 100% { transform: scaleY(1); }
+      95% { transform: scaleY(0.08); }
+    }
+    .kawaii-eyes-blink {
+      animation: kawaiiBlink 4.2s infinite;
+      transform-box: fill-box;
+      transform-origin: center center;
+    }
+
+    .raindrop, .snowflake, .wind-swirl, .wind-leaf, .cloud-drift {
+      will-change: transform, opacity;
+    }
+
+    /* Dragging state highlight */
+    .drop-zone-active {
+      outline: 4px dashed #F59E0B;
+      outline-offset: 6px;
+      background-color: rgba(254, 243, 199, 0.35);
+      border-radius: 24px;
+    }
+
+    /* Touch Drag Ghost */
+    #touchDragGhost {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      width: 84px;
+      height: 84px;
+      transform: translate(-50%, -50%);
+      display: none;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.28));
+    }
+
+    /* Custom Scrollbar for small screens */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.4);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #0284C7;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 min-h-[100dvh] flex flex-col justify-between overflow-x-hidden">
+
+  <!-- Floating Ghost Element for Smooth Mobile/Tablet Touch Dragging -->
+  <div id="touchDragGhost"></div>
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="bg-white border-b-4 border-gray-900 px-2.5 sm:px-4 py-1.5 sm:py-2 shadow-md z-30 shrink-0">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-1.5 sm:gap-2">
+      <!-- Game Title & Logo -->
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-300 border-2 border-gray-900 flex items-center justify-center shadow-sm shrink-0">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5 text-gray-900" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="font-kid text-base sm:text-xl font-bold text-gray-900 leading-tight">Clothes &amp; Weather ESL</h1>
+          <p class="text-[11px] text-gray-600 hidden xl:block">Learn vocabulary &amp; dress for the weather!</p>
+        </div>
+      </div>
+
+      <!-- 6 Slide Tabs (Horizontally scrollable on narrow phones, wrapped on larger screens) -->
+      <nav id="slideNav" class="flex items-center gap-1 sm:gap-1.5 overflow-x-auto max-w-full py-0.5 no-scrollbar">
+        <!-- Populated dynamically by JS -->
+      </nav>
+
+      <!-- Controls: Voice Toggle & Star Counter -->
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <button id="voiceToggleBtn" onclick="toggleVoice()" class="cartoon-pill bg-sky-100 hover:bg-sky-200 text-sky-900 px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold flex items-center gap-1" title="Toggle Spoken Voice">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 text-sky-900" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path id="voiceWavesPath" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          </svg>
+          <span id="voiceLabel" class="hidden md:inline">Voice ON</span>
+        </button>
+
+        <div class="cartoon-pill bg-amber-300 text-gray-900 px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-extrabold flex items-center gap-1">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 text-amber-700 fill-amber-500" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          <span id="starCountText">0 / 6</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN STAGE CONTAINER (Auto-scales per device from mobile phones to tablets & desktops) -->
+  <main class="flex-1 flex items-center justify-center p-1.5 sm:p-3 md:p-4 overflow-y-auto">
+    <div id="stageWrapper" class="relative w-full max-w-6xl min-h-[500px] lg:min-h-[580px] rounded-2xl sm:rounded-3xl cartoon-box overflow-hidden flex flex-col justify-between transition-colors duration-500">
+      
+      <!-- Dynamic Sky / Weather Background Decorations (Sun, Clouds, Rain, Snow, Wind) -->
+      <div id="weatherSkyLayer" class="absolute inset-0 pointer-events-none overflow-hidden z-0"></div>
+
+      <!-- Ground Layer (Green Grass or White Snow) -->
+      <div id="groundLayer" class="absolute bottom-0 left-0 right-0 h-20 sm:h-28 border-t-4 border-gray-900 z-0 transition-colors duration-500" style="background-color: #2E9B47;"></div>
+
+      <!-- Foreground Content Area -->
+      <div id="screenContent" class="relative z-10 flex-1 flex flex-col justify-between p-2.5 sm:p-4 md:p-5">
+        <!-- Rendered by JS for either Screen 1 (Vocab) or Screens 2-6 (Dress-Up) -->
+      </div>
+
+      <!-- Confetti Canvas Overlay -->
+      <canvas id="confettiCanvas" class="absolute inset-0 pointer-events-none z-40 w-full h-full"></canvas>
+    </div>
+  </main>
+
+  <!-- FOOTER BAR WITH QUICK TIPS -->
+  <footer class="bg-slate-800 text-slate-300 text-[11px] sm:text-xs py-1.5 px-3 text-center border-t border-slate-700 shrink-0">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-2">
+      <span><strong>Tip:</strong> Tap any clothing card to hear it! In Dress-Up levels, <strong>tap or drag</strong> clothes onto the child.</span>
+    </div>
+  </footer>
+
+  <!-- COMPLETE APPLICATION LOGIC & SVG ARTWORK LIBRARY -->
+  <script>
+    /*************************************************************************
+     * 1. SOUND & SPEECH ENGINE (Web Speech API + Synthesized Sound Effects)
+     *************************************************************************/
+    let voiceEnabled = true;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) audioCtx = new AudioContext();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(type) {
+      try {
+        initAudio();
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+
+        if (type === 'pop') {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(380, now);
+          osc.frequency.exponentialRampToValueAtTime(720, now + 0.09);
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.1);
+        } else if (type === 'success') {
+          const notes = [523.25, 659.25, 783.99];
+          notes.forEach((freq, idx) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+            gain.gain.setValueAtTime(0.16, now + idx * 0.07);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.22);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now + idx * 0.07);
+            osc.stop(now + idx * 0.07 + 0.23);
+          });
+        } else if (type === 'oops') {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(250, now);
+          osc.frequency.linearRampToValueAtTime(160, now + 0.25);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.26);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.27);
+        } else if (type === 'fanfare') {
+          const notes = [523.25, 659.25, 783.99, 1046.5];
+          notes.forEach((freq, idx) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+            gain.gain.setValueAtTime(0.2, now + idx * 0.09);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.09 + 0.35);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now + idx * 0.09);
+            osc.stop(now + idx * 0.09 + 0.36);
+          });
+        }
+      } catch (e) {
+        // Ignore audio context errors on restricted devices
+      }
+    }
+
+    let activeSpeechToken = 0;
+    let speechQueueTimer = null;
+    let isAudioSpeaking = false;
+    // Prevent browser garbage collection from Prematurely destroying active SpeechSynthesisUtterance objects
+    window._activeUtterance = null;
+
+    function speakText(text, onEndCallback = null) {
+      const myToken = ++activeSpeechToken;
+      if (speechQueueTimer) {
+        clearTimeout(speechQueueTimer);
+        speechQueueTimer = null;
+      }
+
+      if (!voiceEnabled || !('speechSynthesis' in window)) {
+        isAudioSpeaking = false;
+        if (onEndCallback) {
+          speechQueueTimer = setTimeout(() => {
+            if (myToken === activeSpeechToken) onEndCallback();
+          }, 1100);
+        }
+        return;
+      }
+
+      try {
+        // Only cancel if speechSynthesis is actively speaking or pending, reducing engine lockups
+        if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+          window.speechSynthesis.cancel();
+        }
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+        isAudioSpeaking = true;
+
+        speechQueueTimer = setTimeout(() => {
+          if (myToken !== activeSpeechToken) return;
+
+          const utter = new SpeechSynthesisUtterance(text);
+          window._activeUtterance = utter;
+          utter.lang = 'en-US';
+          utter.rate = 0.82; // Slowed down for A1-A2 ESL beginners
+          utter.pitch = 1.06; // Warm, friendly teacher voice
+
+          let callbackFired = false;
+          let backupTimer = null;
+
+          const done = () => {
+            if (callbackFired || myToken !== activeSpeechToken) return;
+            callbackFired = true;
+            if (backupTimer) {
+              clearTimeout(backupTimer);
+              backupTimer = null;
+            }
+            isAudioSpeaking = false;
+            if (onEndCallback) onEndCallback();
+          };
+
+          // Guaranteed fallback timer so the game never hangs if a browser drops onend/onerror
+          const estDuration = Math.max(1900, Math.min(6500, text.length * 115 + 950));
+          backupTimer = setTimeout(done, estDuration);
+
+          utter.onend = () => {
+            setTimeout(done, 150);
+          };
+
+          utter.onerror = () => {
+            // Always advance via done() if this is still the active speech token
+            setTimeout(done, 200);
+          };
+
+          if (window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+          }
+          window.speechSynthesis.speak(utter);
+        }, 80);
+      } catch (e) {
+        console.warn('Speech synthesis error:', e);
+        isAudioSpeaking = false;
+        if (onEndCallback) {
+          setTimeout(() => {
+            if (myToken === activeSpeechToken) onEndCallback();
+          }, 1000);
+        }
+      }
+    }
+
+    function toggleVoice() {
+      voiceEnabled = !voiceEnabled;
+      const waves = document.getElementById('voiceWavesPath');
+      if (waves) waves.style.display = voiceEnabled ? 'block' : 'none';
+      document.getElementById('voiceLabel').textContent = voiceEnabled ? 'Voice ON' : 'Voice OFF';
+      if (!voiceEnabled && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      } else {
+        speakText("Voice is on!");
+      }
+    }
+
+    /*************************************************************************
+     * 2. CUSTOM SVG CLOTHING & CHARACTER ARTWORK LIBRARY
+     *    Every clothing item has a 'card' view (for wardrobe/vocab grids)
+     *    and a 'worn' view mapped to our 260x440 child character coordinate space!
+     *************************************************************************/
+    const CLOTHING_DB = {
+      tshirt_bear: {
+        id: 'tshirt_bear',
+        name: 'T-shirt',
+        slot: 'top',
+        sentence: "T-shirt! I wear a cool T-shirt when it's sunny and hot.",
+        svg: (isWorn = false) => `
+          <g class="clothing-art">
+            <!-- Yellow Bear T-Shirt -->
+            <path d="M85,168 L52,198 L68,220 L88,202 L86,272 Q130,278 174,272 L172,202 L192,220 L208,198 L175,168 Q152,170 146,168 Q130,185 114,168 Q108,170 85,168 Z"
+                  fill="#FACC15" stroke="#111827" stroke-width="3.2" stroke-linejoin="round"/>
+            <!-- Collar & Sleeve Stitch Lines -->
+            <path d="M111,170 Q130,189 149,170" fill="none" stroke="#111827" stroke-width="2.2"/>
+            <line x1="88" y1="202" x2="85" y2="168" stroke="#111827" stroke-width="2"/>
+            <line x1="172" y1="202" x2="175" y2="168" stroke="#111827" stroke-width="2"/>
+            <!-- Cute Brown Bear Face -->
+            <circle cx="112" cy="204" r="9" fill="#A16207" stroke="#111827" stroke-width="2.4"/>
+            <circle cx="112" cy="204" r="4.5" fill="#D97706"/>
+            <circle cx="148" cy="204" r="9" fill="#A16207" stroke="#111827" stroke-width="2.4"/>
+            <circle cx="148" cy="204" r="4.5" fill="#D97706"/>
+            <ellipse cx="130" cy="218" rx="20" ry="18" fill="#A16207" stroke="#111827" stroke-width="2.5"/>
+            <ellipse cx="130" cy="223" rx="8.5" ry="6.5" fill="#FDE68A" stroke="#111827" stroke-width="1.8"/>
+            <circle cx="123" cy="213" r="2.5" fill="#111827"/>
+            <circle cx="137" cy="213" r="2.5" fill="#111827"/>
+            <ellipse cx="130" cy="221" rx="3" ry="2.2" fill="#111827"/>
+            <path d="M127,225 Q130,228 133,225" fill="none" stroke="#111827" stroke-width="1.8" stroke-linecap="round"/>
+          </g>`
+      },
+
+      long_sleeve_combo: {
+        id: 'long_sleeve_combo',
+        name: 'long-sleeved shirt',
+        slot: 'top',
+        sentence: "Long-sleeved shirt! Long sleeves protect our arms in windy or rainy weather.",
+        svg: (isWorn = false) => isWorn ? `
+          <g class="clothing-art">
+            <defs>
+              <clipPath id="clipStripedShirtCombo">
+                <path d="M86,168 L32,232 L50,246 L90,202 L88,270 Q130,275 172,270 L170,202 L210,246 L228,232 L174,168 Q150,172 146,168 Q130,182 114,168 Q110,172 86,168 Z"/>
+              </clipPath>
+            </defs>
+            <g clip-path="url(#clipStripedShirtCombo)">
+              <rect x="25" y="160" width="210" height="120" fill="#FFFFFF"/>
+              <rect x="25" y="172" width="210" height="12" fill="#6EE7B7"/>
+              <rect x="25" y="196" width="210" height="12" fill="#6EE7B7"/>
+              <rect x="25" y="220" width="210" height="12" fill="#6EE7B7"/>
+              <rect x="25" y="244" width="210" height="12" fill="#6EE7B7"/>
+              <rect x="25" y="264" width="210" height="10" fill="#6EE7B7"/>
+            </g>
+            <path d="M86,168 L32,232 L50,246 L90,202 L88,270 Q130,275 172,270 L170,202 L210,246 L228,232 L174,168 Q150,172 146,168 Q130,182 114,168 Q110,172 86,168 Z"
+                  fill="none" stroke="#111827" stroke-width="3.2" stroke-linejoin="round"/>
+            <line x1="90" y1="202" x2="86" y2="168" stroke="#111827" stroke-width="2.2"/>
+            <line x1="170" y1="202" x2="174" y2="168" stroke="#111827" stroke-width="2.2"/>
+          </g>` : `
+          <g class="clothing-art">
+            <!-- Top Left: Striped Green & White Long-Sleeved Shirt -->
+            <g transform="translate(8, 22) scale(0.58)">
+              <path d="M88,168 L36,225 L52,240 L92,198 L90,268 L170,268 L168,198 L208,240 L224,225 L172,168 Q130,180 88,168 Z"
+                    fill="#F8FAFC" stroke="#111827" stroke-width="4" stroke-linejoin="round"/>
+              <path d="M91,190 L169,190 M91,212 L169,212 M91,234 L169,234 M91,256 L169,256" stroke="#6EE7B7" stroke-width="10"/>
+              <path d="M55,212 L78,188 M68,225 L88,204 M182,188 L205,212 M172,204 L192,225" stroke="#6EE7B7" stroke-width="9"/>
+              <path d="M88,168 L36,225 L52,240 L92,198 L90,268 L170,268 L168,198 L208,240 L224,225 L172,168 Q130,180 88,168 Z"
+                    fill="none" stroke="#111827" stroke-width="4" stroke-linejoin="round"/>
+            </g>
+            <!-- Bottom Right: Yellow Button-up Long-Sleeved Shirt -->
+            <g transform="translate(92, 68) scale(0.58)">
+              <path d="M88,168 L36,225 L54,242 L92,200 L86,274 L174,274 L168,200 L206,242 L224,225 L172,168 Q130,178 88,168 Z"
+                    fill="#FACC15" stroke="#111827" stroke-width="4" stroke-linejoin="round"/>
+              <rect x="122" y="174" width="16" height="98" fill="#FEF08A" stroke="#111827" stroke-width="3"/>
+              <polygon points="105,164 124,178 112,192" fill="#FACC15" stroke="#111827" stroke-width="3.5"/>
+              <polygon points="155,164 136,178 148,192" fill="#FACC15" stroke="#111827" stroke-width="3.5"/>
+            </g>
+          </g>`
+      },
+
+      shirt_striped_green: {
+        id: 'shirt_striped_green',
+        name: 'long-sleeved shirt',
+        slot: 'top',
+        sentence: "Long-sleeved shirt! A striped long-sleeved shirt is great for windy days.",
+        svg: () => `
+          <g class="clothing-art">
+            <defs>
+              <clipPath id="clipStripedShirt">
+                <path d="M86,168 L32,232 L50,246 L90,202 L88,270 Q130,275 172,270 L170,202 L210,246 L228,232 L174,168 Q150,172 146,168 Q130,182 114,168 Q110,172 86,168 Z"/>
+              </clipPath>
+            </defs>
+            <g clip-path="url(#clipStripedShirt)">
+              <rect x="25" y="160" width="210" height="120" fill="#FFFFFF"/>
+              <rect x="25" y="172" width="210" height="12" fill="#6EE7B7"/>
+              <rect x="25" y="196" width="210" height="12" fill="#6EE7B7"/>
+              <rect x="25" y="220" width="210" height="12" fill="#6EE7B7"/>
+              <rect x="25" y="244" width="210" height="12" fill="#6EE7B7"/>
+              <rect x="25" y="264" width="210" height="10" fill="#6EE7B7"/>
+            </g>
+            <path d="M86,168 L32,232 L50,246 L90,202 L88,270 Q130,275 172,270 L170,202 L210,246 L228,232 L174,168 Q150,172 146,168 Q130,182 114,168 Q110,172 86,168 Z"
+                  fill="none" stroke="#111827" stroke-width="3.2" stroke-linejoin="round"/>
+            <line x1="90" y1="202" x2="86" y2="168" stroke="#111827" stroke-width="2.2"/>
+            <line x1="170" y1="202" x2="174" y2="168" stroke="#111827" stroke-width="2.2"/>
+          </g>`
+      },
+
+      raincoat_yellow: {
+        id: 'raincoat_yellow',
+        name: 'raincoat',
+        slot: 'top',
+        sentence: "Yellow raincoat! A raincoat keeps your body dry in the rain.",
+        svg: () => `
+          <g class="clothing-art">
+            <!-- Inner yellow shirt -->
+            <rect x="112" y="172" width="36" height="92" fill="#FEF08A" stroke="#111827" stroke-width="2.5"/>
+            <!-- Yellow Raincoat Jacket -->
+            <path d="M86,166 L28,230 L48,248 L88,204 L82,278 L120,280 L122,172 L112,164 Z"
+                  fill="#FACC15" stroke="#111827" stroke-width="3.2" stroke-linejoin="round"/>
+            <path d="M174,166 L232,230 L212,248 L172,204 L178,278 L140,280 L138,172 L148,164 Z"
+                  fill="#FACC15" stroke="#111827" stroke-width="3.2" stroke-linejoin="round"/>
+            <!-- Collar flaps -->
+            <polygon points="112,162 96,178 120,184" fill="#EAB308" stroke="#111827" stroke-width="2.8" stroke-linejoin="round"/>
+            <polygon points="148,162 164,178 140,184" fill="#EAB308" stroke="#111827" stroke-width="2.8" stroke-linejoin="round"/>
+            <!-- Buttons -->
+            <circle cx="116" cy="196" r="2.3" fill="#111827"/>
+            <circle cx="116" cy="218" r="2.3" fill="#111827"/>
+            <circle cx="116" cy="240" r="2.3" fill="#111827"/>
+            <circle cx="116" cy="262" r="2.3" fill="#111827"/>
+          </g>`
+      },
+
+      shirt_teal_open: {
+        id: 'shirt_teal_open',
+        name: 'long-sleeved shirt',
+        slot: 'top',
+        sentence: "Long-sleeved jacket shirt! That has long sleeves, so it's warm.",
+        svg: () => `
+          <g class="clothing-art">
+            <rect x="112" y="172" width="36" height="90" fill="#FEF08A" stroke="#111827" stroke-width="2.5"/>
+            <path d="M86,166 L28,230 L48,248 L88,204 L82,278 L120,280 L122,172 L112,164 Z"
+                  fill="#34D399" stroke="#111827" stroke-width="3.2" stroke-linejoin="round"/>
+            <path d="M174,166 L232,230 L212,248 L172,204 L178,278 L140,280 L138,172 L148,164 Z"
+                  fill="#34D399" stroke="#111827" stroke-width="3.2" stroke-linejoin="round"/>
+            <polygon points="112,162 96,178 120,184" fill="#10B981" stroke="#111827" stroke-width="2.8"/>
+            <polygon points="148,162 164,178 140,184" fill="#10B981" stroke="#111827" stroke-width="2.8"/>
+          </g>`
+      },
+
+      cardigan_purple: {
+        id: 'cardigan_purple',
+        name: 'cardigan sweater',
+        slot: 'top',
+        sentence: "Cardigan sweater! A warm button-up sweater for cool weather.",
+        svg: () => `
+          <g class="clothing-art">
+            <path d="M86,168 L30,232 L48,248 L88,204 L86,272 Q130,278 174,272 L172,204 L212,248 L230,232 L174,168 L146,168 L130,196 L114,168 Z"
+                  fill="#A5B4FC" stroke="#111827" stroke-width="3.2" stroke-linejoin="round"/>
+            <!-- White Chest Stripe -->
+            <path d="M87,212 L173,212 L173,230 L87,230 Z" fill="#E0E7FF" stroke="#111827" stroke-width="2"/>
+            <!-- Ribbed Hem & Buttons -->
+            <rect x="86" y="260" width="88" height="12" fill="#818CF8" stroke="#111827" stroke-width="2.5"/>
+            <line x1="130" y1="196" x2="130" y2="272" stroke="#111827" stroke-width="2.5"/>
+            <circle cx="130" cy="210" r="2.5" fill="#FEF08A" stroke="#111827" stroke-width="1.5"/>
+            <circle cx="130" cy="228" r="2.5" fill="#FEF08A" stroke="#111827" stroke-width="1.5"/>
+            <circle cx="130" cy="246" r="2.5" fill="#FEF08A" stroke="#111827" stroke-width="1.5"/>
+          </g>`
+      },
+
+      sweater_turtleneck: {
+        id: 'sweater_turtleneck',
+        name: 'turtleneck sweater',
+        slot: 'top',
+        sentence: "Turtleneck sweater! A thick wool sweater for cold winter days.",
+        svg: () => `
+          <g class="clothing-art">
+            <path d="M108,152 L152,152 L155,172 L175,172 L228,232 L210,250 L172,208 L174,274 L86,274 L88,208 L50,250 L32,232 L85,172 L105,172 Z"
+                  fill="#D6C7B2" stroke="#111827" stroke-width="3.2" stroke-linejoin="round"/>
+            <!-- Ribbed Turtleneck & Hem -->
+            <rect x="108" y="152" width="44" height="20" rx="4" fill="#BFA88E" stroke="#111827" stroke-width="2.6"/>
+            <line x1="118" y1="152" x2="118" y2="172" stroke="#111827" stroke-width="1.8"/>
+            <line x1="130" y1="152" x2="130" y2="172" stroke="#111827" stroke-width="1.8"/>
+            <line x1="142" y1="152" x2="142" y2="172" stroke="#111827" stroke-width="1.8"/>
+            <rect x="86" y="258" width="88" height="16" rx="3" fill="#BFA88E" stroke="#111827" stroke-width="2.6"/>
+          </g>`
+      },
+
+      sweater_pink: {
+        id: 'sweater_pink',
+        name: 'sweater',
+        slot: 'top',
+        sentence: "Sweater! A cozy pink hoodie sweater keeps you warm in cold or windy weather.",
+        svg: () => `
+          <g class="clothing-art">
+            <!-- Hood behind neck -->
+            <ellipse cx="130" cy="164" rx="38" ry="15" fill="#F9A8D4" stroke="#111827" stroke-width="3"/>
+            <ellipse cx="130" cy="164" rx="26" ry="9" fill="#EC4899" stroke="#111827" stroke-width="2"/>
+            <!-- Main Hoodie Body -->
+            <path d="M86,168 L30,232 L48,248 L88,206 L86,272 Q130,278 174,272 L172,206 L212,248 L230,232 L174,168 Q150,174 130,178 Q110,174 86,168 Z"
+                  fill="#FBCFE8" stroke="#111827" stroke-width="3.2" stroke-linejoin="round"/>
+            <!-- Kangaroo Pocket -->
+            <polygon points="100,258 108,234 152,234 160,258" fill="#F9A8D4" stroke="#111827" stroke-width="2.4" stroke-linejoin="round"/>
+            <!-- Drawstrings -->
+            <path d="M118,176 L116,222" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M118,176 L116,222" stroke="#111827" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M142,176 L144,222" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M142,176 L144,222" stroke="#111827" stroke-width="1.2" stroke-linecap="round"/>
+          </g>`
+      },
+
+      jacket_puffer: {
+        id: 'jacket_puffer',
+        name: 'jacket',
+        slot: 'outerwear',
+        sentence: "Jacket! I wear a warm brown jacket when it's snowy and freezing cold.",
+        svg: () => `
+          <g class="clothing-art">
+            <!-- Warm Hood -->
+            <ellipse cx="130" cy="162" rx="40" ry="17" fill="#92400E" stroke="#111827" stroke-width="3.2"/>
+            <ellipse cx="130" cy="163" rx="28" ry="10" fill="#78350F" stroke="#111827" stroke-width="2.2"/>
+            <!-- Puffer Jacket Body -->
+            <path d="M84,166 L26,232 L48,250 L86,208 L84,274 Q130,280 176,274 L174,208 L212,250 L234,232 L176,166 Q152,174 130,182 Q108,174 84,166 Z"
+                  fill="#B45309" stroke="#111827" stroke-width="3.4" stroke-linejoin="round"/>
+            <!-- Quilted Puffer Lines & Zipper -->
+            <line x1="130" y1="182" x2="130" y2="276" stroke="#111827" stroke-width="3.5"/>
+            <line x1="86" y1="206" x2="174" y2="206" stroke="#111827" stroke-width="2.2"/>
+            <line x1="85" y1="234" x2="175" y2="234" stroke="#111827" stroke-width="2.2"/>
+            <line x1="85" y1="262" x2="175" y2="262" stroke="#111827" stroke-width="2.2"/>
+            <!-- Side Pockets -->
+            <line x1="96" y1="238" x2="108" y2="254" stroke="#78350F" stroke-width="4" stroke-linecap="round"/>
+            <line x1="164" y1="238" x2="152" y2="254" stroke="#78350F" stroke-width="4" stroke-linecap="round"/>
+          </g>`
+      },
+
+      shirt_teal_floral: {
+        id: 'shirt_teal_floral',
+        name: 'long-sleeved shirt',
+        slot: 'top',
+        sentence: "Long-sleeved shirt! A pretty teal shirt is comfy for a cloudy day.",
+        svg: () => `
+          <g class="clothing-art">
+            <path d="M86,168 L30,232 L48,248 L88,204 L86,270 Q130,276 174,270 L172,204 L212,248 L230,232 L174,168 Q150,172 130,180 Q110,172 86,168 Z"
+                  fill="#14B8A6" stroke="#111827" stroke-width="3.2" stroke-linejoin="round"/>
+            <!-- Yellow Collar & Placket -->
+            <path d="M110,168 L130,188 L150,168" fill="none" stroke="#FACC15" stroke-width="6" stroke-linecap="round"/>
+            <rect x="126" y="184" width="8" height="36" fill="#FACC15" stroke="#111827" stroke-width="2"/>
+            <!-- Floral Hem Decoration -->
+            <circle cx="102" cy="256" r="10" fill="#FACC15" stroke="#111827" stroke-width="2"/>
+            <circle cx="102" cy="256" r="4" fill="#D97706"/>
+            <circle cx="158" cy="256" r="10" fill="#FACC15" stroke="#111827" stroke-width="2"/>
+            <circle cx="158" cy="256" r="4" fill="#D97706"/>
+            <circle cx="44" cy="234" r="6" fill="#FACC15" stroke="#111827" stroke-width="1.8"/>
+            <circle cx="216" cy="234" r="6" fill="#FACC15" stroke="#111827" stroke-width="1.8"/>
+          </g>`
+      },
+
+      shorts_blue: {
+        id: 'shorts_blue',
+        name: 'shorts',
+        slot: 'bottom',
+        sentence: "Shorts! Light blue shorts keep your legs cool when it's hot.",
+        svg: () => `
+          <g class="clothing-art">
+            <path d="M90,262 L170,262 L178,318 L134,318 L130,296 L126,318 L82,318 Z"
+                  fill="#7DD3FC" stroke="#111827" stroke-width="3.2" stroke-linejoin="round"/>
+            <!-- Waistband & Button -->
+            <line x1="90" y1="272" x2="170" y2="272" stroke="#111827" stroke-width="2.4"/>
+            <circle cx="130" cy="267" r="3" fill="#FACC15" stroke="#111827" stroke-width="1.8"/>
+            <line x1="130" y1="272" x2="130" y2="296" stroke="#111827" stroke-width="2.2"/>
+            <!-- Pockets -->
+            <path d="M90,274 Q104,284 106,272" fill="none" stroke="#111827" stroke-width="2"/>
+            <path d="M170,274 Q156,284 154,272" fill="none" stroke="#111827" stroke-width="2"/>
+          </g>`
+      },
+
+      shorts_red: {
+        id: 'shorts_red',
+        name: 'red shorts',
+        slot: 'bottom',
+        sentence: "Red shorts! Comfortable shorts for playing outside on a cloudy day.",
+        svg: () => `
+          <g class="clothing-art">
+            <path d="M90,262 L170,262 L176,326 L134,326 L130,298 L126,326 L84,326 Z"
+                  fill="#EF4444" stroke="#111827" stroke-width="3.2" stroke-linejoin="round"/>
+            <line x1="90" y1="272" x2="170" y2="272" stroke="#111827" stroke-width="2.4"/>
+            <!-- White Drawstring -->
+            <path d="M126,267 Q120,282 122,288 M134,267 Q140,282 138,288" fill="none" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round"/>
+          </g>`
+      },
+
+      shorts_grey: {
+        id: 'shorts_grey',
+        name: 'sport shorts',
+        slot: 'bottom',
+        sentence: "Sport shorts! Great athletic shorts for running and playing.",
+        svg: () => `
+          <g class="clothing-art">
+            <path d="M90,262 L170,262 L176,316 Q155,322 134,316 L130,296 L126,316 Q105,322 84,316 Z"
+                  fill="#4B5563" stroke="#111827" stroke-width="3.2" stroke-linejoin="round"/>
+            <rect x="90" y="262" width="80" height="9" fill="#EA580C" stroke="#111827" stroke-width="2.4"/>
+            <path d="M126,267 L122,286 M134,267 L138,286" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round"/>
+          </g>`
+      },
+
+      skirt_floral: {
+        id: 'skirt_floral',
+        name: 'skirt',
+        slot: 'bottom',
+        sentence: "Skirt! A pretty pink skirt with flowers.",
+        svg: () => `
+          <g class="clothing-art">
+            <path d="M94,262 L166,262 L186,316 Q168,324 150,316 Q130,324 110,316 Q92,324 74,316 Z"
+                  fill="#FCE7F3" stroke="#111827" stroke-width="3.2" stroke-linejoin="round"/>
+            <!-- Blue Scalloped Trim -->
+            <path d="M74,312 Q92,320 110,312 Q130,320 150,312 Q168,320 186,312 L186,318 Q168,326 150,318 Q130,326 110,318 Q92,326 74,318 Z"
+                  fill="#7DD3FC" stroke="#111827" stroke-width="2.2"/>
+            <line x1="94" y1="270" x2="166" y2="270" stroke="#111827" stroke-width="2.2"/>
+            <!-- Little Flowers -->
+            <circle cx="96" cy="302" r="4.5" fill="#F472B6" stroke="#111827" stroke-width="1.3"/>
+            <circle cx="118" cy="305" r="4.5" fill="#A78BFA" stroke="#111827" stroke-width="1.3"/>
+            <circle cx="142" cy="305" r="4.5" fill="#F472B6" stroke="#111827" stroke-width="1.3"/>
+            <circle cx="164" cy="302" r="4.5" fill="#A78BFA" stroke="#111827" stroke-width="1.3"/>
+          </g>`
+      },
+
+      pants_cargo: {
+        id: 'pants_cargo',
+        name: 'pants',
+        slot: 'bottom',
+        sentence: "Pants! Long grey cargo pants keep your legs warm and dry.",
+        svg: () => `
+          <g class="clothing-art">
+            <path d="M92,262 L168,262 L176,386 L142,386 L130,302 L118,386 L84,386 Z"
+                  fill="#6B7280" stroke="#111827" stroke-width="3.2" stroke-linejoin="round"/>
+            <!-- Waistband & Cuffs -->
+            <rect x="92" y="262" width="76" height="10" fill="#4B5563" stroke="#111827" stroke-width="2.5"/>
+            <rect x="84" y="376" width="34" height="10" fill="#4B5563" stroke="#111827" stroke-width="2.5"/>
+            <rect x="142" y="376" width="34" height="10" fill="#4B5563" stroke="#111827" stroke-width="2.5"/>
+            <!-- Cargo Pockets -->
+            <rect x="86" y="322" width="18" height="24" rx="3" fill="#4B5563" stroke="#111827" stroke-width="2.2"/>
+            <rect x="156" y="322" width="18" height="24" rx="3" fill="#4B5563" stroke="#111827" stroke-width="2.2"/>
+          </g>`
+      },
+
+      jeans_blue: {
+        id: 'jeans_blue',
+        name: 'pants',
+        slot: 'bottom',
+        sentence: "Pants! Blue jeans protect your legs when it is cold or windy.",
+        svg: () => `
+          <g class="clothing-art">
+            <path d="M92,262 L168,262 L176,386 L142,386 L130,302 L118,386 L84,386 Z"
+                  fill="#60A5FA" stroke="#111827" stroke-width="3.2" stroke-linejoin="round"/>
+            <line x1="92" y1="272" x2="168" y2="272" stroke="#111827" stroke-width="2.4"/>
+            <circle cx="130" cy="267" r="2.6" fill="#FACC15" stroke="#111827" stroke-width="1.5"/>
+            <line x1="130" y1="272" x2="130" y2="300" stroke="#111827" stroke-width="2.2"/>
+            <!-- Knee creases -->
+            <path d="M96,332 Q104,336 112,332" fill="none" stroke="#1E3A8A" stroke-width="2" stroke-linecap="round"/>
+            <path d="M148,332 Q156,336 164,332" fill="none" stroke="#1E3A8A" stroke-width="2" stroke-linecap="round"/>
+          </g>`
+      },
+
+      dress_ruffle: {
+        id: 'dress_ruffle',
+        name: 'dress',
+        slot: 'dress',
+        sentence: "Dress! A pink ruffled dress with shoulder bows.",
+        svg: () => `
+          <g class="clothing-art">
+            <!-- Shoulder Straps & Bows -->
+            <rect x="98" y="168" width="9" height="24" fill="#F472B6" stroke="#111827" stroke-width="2.4"/>
+            <rect x="153" y="168" width="9" height="24" fill="#F472B6" stroke="#111827" stroke-width="2.4"/>
+            <ellipse cx="95" cy="168" rx="8" ry="5" fill="#FDE68A" stroke="#111827" stroke-width="2"/>
+            <ellipse cx="109" cy="168" rx="8" ry="5" fill="#FDE68A" stroke="#111827" stroke-width="2"/>
+            <ellipse cx="151" cy="168" rx="8" ry="5" fill="#FDE68A" stroke="#111827" stroke-width="2"/>
+            <ellipse cx="165" cy="168" rx="8" ry="5" fill="#FDE68A" stroke="#111827" stroke-width="2"/>
+            <!-- Bodice -->
+            <path d="M94,190 L166,190 L162,240 L98,240 Z" fill="#F472B6" stroke="#111827" stroke-width="3"/>
+            <!-- Ruffle Tier 1 -->
+            <path d="M98,240 L162,240 L176,272 Q130,282 84,272 Z" fill="#F9A8D4" stroke="#111827" stroke-width="2.8"/>
+            <!-- Ruffle Tier 2 -->
+            <path d="M86,270 L174,270 L188,302 Q130,312 72,302 Z" fill="#F472B6" stroke="#111827" stroke-width="2.8"/>
+            <!-- Ruffle Tier 3 -->
+            <path d="M74,300 L186,300 L198,332 Q130,344 62,332 Z" fill="#F9A8D4" stroke="#111827" stroke-width="3"/>
+          </g>`
+      },
+
+      dress_ruffle_yellow: {
+        id: 'dress_ruffle_yellow',
+        name: 'yellow dress',
+        slot: 'dress',
+        sentence: "Yellow dress! Mia is wearing a cheerful yellow ruffled dress.",
+        svg: () => `
+          <g class="clothing-art">
+            <!-- Puffy Ruffle Sleeves -->
+            <path d="M94,174 Q64,170 68,196 Q76,208 94,202 Z" fill="#FEF08A" stroke="#3B2316" stroke-width="3"/>
+            <path d="M166,174 Q196,170 192,196 Q184,208 166,202 Z" fill="#FEF08A" stroke="#3B2316" stroke-width="3"/>
+            <!-- Bodice -->
+            <path d="M92,174 L110,174 Q130,190 150,174 L168,174 L164,242 L96,242 Z" fill="#FACC15" stroke="#3B2316" stroke-width="3.2" stroke-linejoin="round"/>
+            <!-- Skirt Ruffle Tiers -->
+            <path d="M96,242 L164,242 L182,286 Q130,298 78,286 Z" fill="#FDE047" stroke="#3B2316" stroke-width="3"/>
+            <path d="M82,282 L178,282 L196,332 Q130,348 64,332 Z" fill="#FACC15" stroke="#3B2316" stroke-width="3.2"/>
+            <path d="M64,326 Q96,338 130,328 Q164,338 196,326" fill="none" stroke="#FEF08A" stroke-width="4" stroke-linecap="round"/>
+          </g>`
+      },
+
+      dress_pink_simple: {
+        id: 'dress_pink_simple',
+        name: 'dress',
+        slot: 'dress',
+        sentence: "Pink dress! A cheerful pink dress for a mild cloudy day.",
+        svg: () => `
+          <g class="clothing-art">
+            <path d="M88,170 Q72,172 74,194 L92,198 L96,236 L70,322 Q130,334 190,322 L164,236 L168,198 L186,194 Q188,172 172,170 L150,170 Q130,186 110,170 Z"
+                  fill="#EC4899" stroke="#111827" stroke-width="3.2" stroke-linejoin="round"/>
+            <line x1="96" y1="236" x2="164" y2="236" stroke="#111827" stroke-width="2.5"/>
+          </g>`
+      },
+
+      socks_white: {
+        id: 'socks_white',
+        name: 'socks',
+        slot: 'socks',
+        sentence: "Socks! Put on warm socks before your shoes.",
+        svg: () => `
+          <g class="clothing-art">
+            <!-- Left Leg Sock -->
+            <path d="M88,370 L114,370 L114,414 Q114,424 98,424 L82,424 Q74,424 76,414 L88,402 Z"
+                  fill="#E5E7EB" stroke="#111827" stroke-width="2.8" stroke-linejoin="round"/>
+            <rect x="88" y="370" width="26" height="9" fill="#D1D5DB" stroke="#111827" stroke-width="2.2"/>
+            <!-- Right Leg Sock -->
+            <path d="M146,370 L172,370 L172,402 L184,414 Q186,424 178,424 L162,424 Q146,424 146,414 Z"
+                  fill="#E5E7EB" stroke="#111827" stroke-width="2.8" stroke-linejoin="round"/>
+            <rect x="146" y="370" width="26" height="9" fill="#D1D5DB" stroke="#111827" stroke-width="2.2"/>
+          </g>`
+      },
+
+      socks_black: {
+        id: 'socks_black',
+        name: 'socks',
+        slot: 'socks',
+        sentence: "Black socks! Warm socks keep your feet cozy inside your sneakers.",
+        svg: () => `
+          <g class="clothing-art">
+            <path d="M88,370 L114,370 L114,414 Q114,424 98,424 L82,424 Q74,424 76,414 L88,402 Z"
+                  fill="#1F2937" stroke="#111827" stroke-width="2.8" stroke-linejoin="round"/>
+            <path d="M146,370 L172,370 L172,402 L184,414 Q186,424 178,424 L162,424 Q146,424 146,414 Z"
+                  fill="#1F2937" stroke="#111827" stroke-width="2.8" stroke-linejoin="round"/>
+          </g>`
+      },
+
+      sandals_blue: {
+        id: 'sandals_blue',
+        name: 'sandals',
+        slot: 'shoes',
+        sentence: "Sandals! Open sandals keep your feet cool on a hot, sunny day.",
+        svg: () => `
+          <g class="clothing-art">
+            <!-- Left Sandal -->
+            <g>
+              <rect x="72" y="418" width="44" height="10" rx="5" fill="#D6C7B2" stroke="#111827" stroke-width="2.6"/>
+              <path d="M76,418 Q94,394 112,418" fill="none" stroke="#60A5FA" stroke-width="8" stroke-linecap="round"/>
+              <path d="M76,418 Q94,394 112,418" fill="none" stroke="#111827" stroke-width="2.4"/>
+              <rect x="75" y="408" width="38" height="7" rx="3" fill="#3B82F6" stroke="#111827" stroke-width="2.2"/>
+            </g>
+            <!-- Right Sandal -->
+            <g>
+              <rect x="144" y="418" width="44" height="10" rx="5" fill="#D6C7B2" stroke="#111827" stroke-width="2.6"/>
+              <path d="M148,418 Q166,394 184,418" fill="none" stroke="#60A5FA" stroke-width="8" stroke-linecap="round"/>
+              <path d="M148,418 Q166,394 184,418" fill="none" stroke="#111827" stroke-width="2.4"/>
+              <rect x="147" y="408" width="38" height="7" rx="3" fill="#3B82F6" stroke="#111827" stroke-width="2.2"/>
+            </g>
+          </g>`
+      },
+
+      sneakers_orange: {
+        id: 'sneakers_orange',
+        name: 'sneakers',
+        slot: 'shoes',
+        sentence: "Sneakers! Sturdy sneakers protect your feet when walking or running.",
+        svg: () => `
+          <g class="clothing-art">
+            <!-- Left Sneaker -->
+            <path d="M72,420 Q72,396 96,396 L114,396 L116,420 Z" fill="#F59E0B" stroke="#111827" stroke-width="2.8" stroke-linejoin="round"/>
+            <path d="M72,420 Q84,410 100,420 Z" fill="#2DD4BF" stroke="#111827" stroke-width="2"/>
+            <rect x="70" y="419" width="48" height="9" rx="4.5" fill="#FFFFFF" stroke="#111827" stroke-width="2.6"/>
+            <line x1="88" y1="402" x2="104" y2="402" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>
+            <line x1="85" y1="408" x2="102" y2="408" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>
+            <!-- Right Sneaker -->
+            <path d="M146,396 L164,396 Q188,396 188,420 L144,420 Z" fill="#F59E0B" stroke="#111827" stroke-width="2.8" stroke-linejoin="round"/>
+            <path d="M160,420 Q176,410 188,420 Z" fill="#2DD4BF" stroke="#111827" stroke-width="2"/>
+            <rect x="142" y="419" width="48" height="9" rx="4.5" fill="#FFFFFF" stroke="#111827" stroke-width="2.6"/>
+            <line x1="156" y1="402" x2="172" y2="402" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>
+            <line x1="158" y1="408" x2="175" y2="408" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>
+          </g>`
+      },
+
+      sneakers_black: {
+        id: 'sneakers_black',
+        name: 'sneakers',
+        slot: 'shoes',
+        sentence: "Sneakers! Closed sneakers keep your feet warm on windy days.",
+        svg: () => `
+          <g class="clothing-art">
+            <path d="M72,420 Q72,396 96,396 L114,396 L116,420 Z" fill="#1F2937" stroke="#111827" stroke-width="2.8"/>
+            <rect x="70" y="419" width="48" height="9" rx="4.5" fill="#FFFFFF" stroke="#111827" stroke-width="2.6"/>
+            <line x1="86" y1="403" x2="104" y2="403" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>
+            <line x1="84" y1="409" x2="102" y2="409" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>
+
+            <path d="M146,396 L164,396 Q188,396 188,420 L144,420 Z" fill="#1F2937" stroke="#111827" stroke-width="2.8"/>
+            <rect x="142" y="419" width="48" height="9" rx="4.5" fill="#FFFFFF" stroke="#111827" stroke-width="2.6"/>
+            <line x1="156" y1="403" x2="174" y2="403" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>
+            <line x1="158" y1="409" x2="176" y2="409" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>
+          </g>`
+      },
+
+      sneakers_pink: {
+        id: 'sneakers_pink',
+        name: 'pink sneakers',
+        slot: 'shoes',
+        sentence: "Pink sneakers! Cute and comfy sneakers for walking outside.",
+        svg: () => `
+          <g class="clothing-art">
+            <path d="M72,420 Q72,396 96,396 L114,396 L116,420 Z" fill="#EC4899" stroke="#111827" stroke-width="2.8"/>
+            <rect x="70" y="419" width="48" height="9" rx="4.5" fill="#FFFFFF" stroke="#111827" stroke-width="2.6"/>
+            <line x1="86" y1="404" x2="104" y2="404" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>
+
+            <path d="M146,396 L164,396 Q188,396 188,420 L144,420 Z" fill="#EC4899" stroke="#111827" stroke-width="2.8"/>
+            <rect x="142" y="419" width="48" height="9" rx="4.5" fill="#FFFFFF" stroke="#111827" stroke-width="2.6"/>
+            <line x1="156" y1="404" x2="174" y2="404" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>
+          </g>`
+      },
+
+      boots_blue: {
+        id: 'boots_blue',
+        name: 'snow boots',
+        slot: 'shoes',
+        sentence: "Snow boots! Warm winter boots keep your toes cozy in the snow.",
+        svg: () => `
+          <g class="clothing-art">
+            <!-- Left Boot -->
+            <path d="M84,382 L114,382 L116,422 L72,422 Q70,404 84,402 Z" fill="#38BDF8" stroke="#111827" stroke-width="2.8" stroke-linejoin="round"/>
+            <rect x="70" y="419" width="48" height="9" rx="4" fill="#9CA3AF" stroke="#111827" stroke-width="2.6"/>
+            <rect x="82" y="390" width="32" height="6" rx="2" fill="#0284C7" stroke="#111827" stroke-width="1.8"/>
+            <rect x="80" y="401" width="34" height="6" rx="2" fill="#0284C7" stroke="#111827" stroke-width="1.8"/>
+            <!-- Right Boot -->
+            <path d="M146,382 L176,382 L176,402 Q190,404 188,422 L144,422 Z" fill="#38BDF8" stroke="#111827" stroke-width="2.8" stroke-linejoin="round"/>
+            <rect x="142" y="419" width="48" height="9" rx="4" fill="#9CA3AF" stroke="#111827" stroke-width="2.6"/>
+            <rect x="146" y="390" width="32" height="6" rx="2" fill="#0284C7" stroke="#111827" stroke-width="1.8"/>
+            <rect x="146" y="401" width="34" height="6" rx="2" fill="#0284C7" stroke="#111827" stroke-width="1.8"/>
+          </g>`
+      },
+
+      umbrella_rainbow: {
+        id: 'umbrella_rainbow',
+        name: 'umbrella',
+        slot: 'accessory',
+        sentence: "Umbrella! Hold an umbrella to stay dry when it's so rainy!",
+        svg: () => `
+          <g class="clothing-art">
+            <!-- Handle Stick held in child's hand -->
+            <line x1="175" y1="78" x2="215" y2="246" stroke="#111827" stroke-width="5" stroke-linecap="round"/>
+            <path d="M215,246 Q220,264 204,262 Q196,260 198,250" fill="none" stroke="#78350F" stroke-width="7" stroke-linecap="round"/>
+            <!-- Rainbow Canopy -->
+            <path d="M75,112 Q120,24 175,68 Q230,24 252,126 Q210,114 175,122 Q130,110 75,112 Z"
+                  fill="#EF4444" stroke="#111827" stroke-width="3.4" stroke-linejoin="round"/>
+            <path d="M75,112 Q118,42 175,68 L135,114 Z" fill="#F59E0B" stroke="#111827" stroke-width="2.6"/>
+            <path d="M135,114 L175,68 L185,120 Z" fill="#22C55E" stroke="#111827" stroke-width="2.6"/>
+            <path d="M185,120 L175,68 Q218,52 252,126 Z" fill="#3B82F6" stroke="#111827" stroke-width="2.6"/>
+          </g>`
+      },
+
+      bow_blue: {
+        id: 'bow_blue',
+        name: 'bow',
+        slot: 'headwear',
+        sentence: "Blue bow! A cute hair bow or bow tie.",
+        svg: () => `
+          <g class="clothing-art">
+            <path d="M162,48 C142,32 142,68 162,54 Z" fill="#7DD3FC" stroke="#111827" stroke-width="2.6" stroke-linejoin="round"/>
+            <path d="M168,48 C188,32 188,68 168,54 Z" fill="#7DD3FC" stroke="#111827" stroke-width="2.6" stroke-linejoin="round"/>
+            <circle cx="165" cy="51" r="5.5" fill="#38BDF8" stroke="#111827" stroke-width="2.4"/>
+          </g>`
+      },
+
+      bow_pink: {
+        id: 'bow_pink',
+        name: 'pink bow',
+        slot: 'headwear',
+        sentence: "Pink bow! A lovely pink hair bow.",
+        svg: () => `
+          <g class="clothing-art">
+            <path d="M162,48 C142,32 142,68 162,54 Z" fill="#F472B6" stroke="#111827" stroke-width="2.6" stroke-linejoin="round"/>
+            <path d="M168,48 C188,32 188,68 168,54 Z" fill="#F472B6" stroke="#111827" stroke-width="2.6" stroke-linejoin="round"/>
+            <circle cx="165" cy="51" r="5.5" fill="#EC4899" stroke="#111827" stroke-width="2.4"/>
+          </g>`
+      }
+    };
+
+    // Pre-rendered SVG cache for instant, lag-free card rendering across all devices
+    const CARD_SVG_CACHE = {};
+
+    // Renders a standalone centered SVG icon for the Wardrobe / Vocabulary Cards
+    function renderCardItemSVG(itemId) {
+      if (CARD_SVG_CACHE[itemId]) return CARD_SVG_CACHE[itemId];
+      const item = CLOTHING_DB[itemId];
+      if (!item) return '';
+      // Map each slot to its optimal bounding viewBox so the card looks zoomed and crisp
+      const viewBoxMap = {
+        top: '20 145 220 145',
+        outerwear: '20 145 220 145',
+        bottom: '65 252 130 142',
+        dress: '50 155 160 195',
+        socks: '65 362 130 70',
+        shoes: '62 375 136 62',
+        accessory: '65 30 198 242',
+        headwear: '135 28 60 46'
+      };
+      const vb = itemId === 'long_sleeve_combo'
+        ? '15 108 220 130'
+        : (viewBoxMap[item.slot] || '20 140 220 200');
+
+      const svgMarkup = `
+        <svg viewBox="${vb}" preserveAspectRatio="xMidYMid meet" class="w-full h-full drop-shadow-sm pointer-events-none">
+          ${item.svg(false)}
+        </svg>
+      `;
+      CARD_SVG_CACHE[itemId] = svgMarkup;
+      return svgMarkup;
+    }
+
+    /*************************************************************************
+     * 3. 6 SLIDE LEVELS CONFIGURATION (3 Girls & 3 Boys in Alternating Order)
+     *************************************************************************/
+    const LEVELS = [
+      {
+        id: 1,
+        type: 'vocab',
+        weatherKey: 'vocab',
+        tabLabel: '1. Vocabulary',
+        characterType: 'girl_1',
+        characterName: 'Mia',
+        genderLabel: 'Girl 1',
+        skyColor: '#7DD3FC',
+        groundColor: '#2E9B47',
+        vocabItems: [
+          'tshirt_bear', 'long_sleeve_combo', 'shorts_blue', 'skirt_floral',
+          'dress_ruffle', 'jacket_puffer', 'pants_cargo', 'sweater_pink',
+          'sandals_blue', 'socks_white', 'sneakers_orange'
+        ]
+      },
+      {
+        id: 2,
+        type: 'dressup',
+        weatherKey: 'sunny',
+        tabLabel: '2. Sunny',
+        characterType: 'boy_1',
+        characterName: 'Leo',
+        genderLabel: 'Boy 1',
+        skyColor: '#7DD3FC',
+        groundColor: '#2E9B47',
+        thoughtHtml: `It’s <span class="text-red-600">very</span> hot!`,
+        thoughtSpeech: "It's very hot! Dress the child with the correct clothing for sunny weather.",
+        instruction: 'Dress the child with the correct clothing for sunny weather.',
+        wardrobe: [
+          'shirt_teal_open', 'cardigan_purple', 'socks_white',
+          'sweater_turtleneck', 'sandals_blue', 'sneakers_orange',
+          'shorts_blue', 'tshirt_bear'
+        ],
+        wrongReasons: {
+          shirt_teal_open: "It's very hot! A long-sleeved jacket shirt is too warm for sunny weather.",
+          cardigan_purple: "Phew, too hot! A cardigan sweater is for cool weather, not a very hot day.",
+          sweater_turtleneck: "Oh no, a turtleneck sweater is way too hot for sunny weather!",
+          socks_white: "It's very hot! Let's wear cool sandals without thick socks today.",
+          sneakers_orange: "Sneakers are warm! Try cool open sandals for a very hot sunny day."
+        },
+        checkComplete: (worn) => {
+          const hasTop = worn.top === 'tshirt_bear';
+          const hasBottom = worn.bottom === 'shorts_blue';
+          const hasShoes = worn.shoes === 'sandals_blue';
+          const isComplete = hasTop && hasBottom && hasShoes;
+          const missing = [];
+          if (!hasTop) missing.push('a cool T-shirt');
+          if (!hasBottom) missing.push('shorts');
+          if (!hasShoes) missing.push('sandals');
+          return {
+            isComplete,
+            missingHint: missing.length ? `Still needed: ${missing.join(' + ')}` : ''
+          };
+        }
+      },
+      {
+        id: 3,
+        type: 'dressup',
+        weatherKey: 'rainy',
+        tabLabel: '3. Rainy',
+        characterType: 'girl_2',
+        characterName: 'Hana',
+        genderLabel: 'Girl 2',
+        skyColor: '#94A3B8',
+        groundColor: '#2E9B47',
+        thoughtHtml: `It’s <span class="text-red-600">so</span> rainy!`,
+        thoughtSpeech: "It's so rainy! Dress the child with the correct clothing for rainy weather.",
+        instruction: 'Dress the child with the correct clothing for rainy weather.',
+        wardrobe: [
+          'umbrella_rainbow', 'shorts_blue', 'socks_black',
+          'sneakers_orange', 'sandals_blue', 'pants_cargo', 'raincoat_yellow'
+        ],
+        wrongReasons: {
+          shorts_blue: "Brrr! Shorts will let your legs get wet and cold in the rain. Try long pants!",
+          sandals_blue: "Splash! Open sandals will get your feet soaked in the rain. Try socks and sneakers!"
+        },
+        checkComplete: (worn) => {
+          const hasTop = worn.top === 'raincoat_yellow';
+          const hasBottom = worn.bottom === 'pants_cargo';
+          const hasShoes = worn.shoes === 'sneakers_orange';
+          const hasUmbrella = worn.accessory === 'umbrella_rainbow';
+          const isComplete = hasTop && hasBottom && hasShoes && hasUmbrella;
+          const missing = [];
+          if (!hasTop) missing.push('raincoat');
+          if (!hasBottom) missing.push('long pants');
+          if (!hasShoes) missing.push('sneakers');
+          if (!hasUmbrella) missing.push('umbrella');
+          return {
+            isComplete,
+            missingHint: missing.length ? `Still needed: ${missing.join(' + ')}` : ''
+          };
+        }
+      },
+      {
+        id: 4,
+        type: 'dressup',
+        weatherKey: 'snowy',
+        tabLabel: '4. Snowy',
+        characterType: 'boy_2',
+        characterName: 'Noah',
+        genderLabel: 'Boy 2',
+        skyColor: '#E0F2FE',
+        groundColor: '#F8FAFC',
+        thoughtHtml: `I’m <span class="text-red-600">so</span> cold!`,
+        thoughtSpeech: "I'm so cold! Dress the child with the correct clothing for snowy weather.",
+        instruction: 'Dress the child with the correct clothing for snowy weather.',
+        wardrobe: [
+          'sweater_pink', 'skirt_floral', 'jacket_puffer',
+          'sandals_blue', 'jeans_blue', 'socks_white',
+          'bow_blue', 'shorts_blue', 'boots_blue'
+        ],
+        wrongReasons: {
+          skirt_floral: "Brrr! I'm so cold! A short skirt is too freezing for snowy weather!",
+          shorts_blue: "Brrr! Shorts are way too cold for the snow! Pick long warm pants.",
+          sandals_blue: "Brrr! My toes will freeze in open sandals! Pick warm snow boots."
+        },
+        checkComplete: (worn) => {
+          const hasWarmTop = worn.outerwear === 'jacket_puffer' || worn.top === 'sweater_pink';
+          const hasBottom = worn.bottom === 'jeans_blue';
+          const hasSocks = worn.socks === 'socks_white';
+          const hasBoots = worn.shoes === 'boots_blue';
+          const isComplete = hasWarmTop && hasBottom && hasSocks && hasBoots;
+          const missing = [];
+          if (!hasWarmTop) missing.push('warm jacket or sweater');
+          if (!hasBottom) missing.push('long pants');
+          if (!hasSocks) missing.push('warm socks');
+          if (!hasBoots) missing.push('snow boots');
+          return {
+            isComplete,
+            missingHint: missing.length ? `Still needed: ${missing.join(' + ')}` : ''
+          };
+        }
+      },
+      {
+        id: 5,
+        type: 'dressup',
+        weatherKey: 'windy',
+        tabLabel: '5. Windy',
+        characterType: 'girl_3',
+        characterName: 'Sora',
+        genderLabel: 'Girl 3',
+        skyColor: '#7DD3FC',
+        groundColor: '#2E9B47',
+        thoughtHtml: `It’s <span class="text-red-600">very</span> windy!`,
+        thoughtSpeech: "It's very windy! Dress the child with the correct clothing for windy weather.",
+        instruction: 'Dress the child with the correct clothing for windy weather.',
+        wardrobe: [
+          'sweater_pink', 'shirt_striped_green', 'jeans_blue',
+          'sneakers_black', 'sandals_blue', 'dress_ruffle'
+        ],
+        wrongReasons: {
+          dress_ruffle: "Whoosh! It's very windy! A sleeveless ruffled dress is too chilly in strong wind.",
+          sandals_blue: "It's very windy and brisk! Closed sneakers are better than open sandals today."
+        },
+        checkComplete: (worn) => {
+          const hasTop = worn.top === 'sweater_pink' || worn.top === 'shirt_striped_green';
+          const hasBottom = worn.bottom === 'jeans_blue';
+          const hasShoes = worn.shoes === 'sneakers_black';
+          const isComplete = hasTop && hasBottom && hasShoes;
+          const missing = [];
+          if (!hasTop) missing.push('sweater or long-sleeved shirt');
+          if (!hasBottom) missing.push('long pants');
+          if (!hasShoes) missing.push('sneakers');
+          return {
+            isComplete,
+            missingHint: missing.length ? `Still needed: ${missing.join(' + ')}` : ''
+          };
+        }
+      },
+      {
+        id: 6,
+        type: 'dressup',
+        weatherKey: 'cloudy',
+        tabLabel: '6. Cloudy',
+        characterType: 'boy_3',
+        characterName: 'Kai',
+        genderLabel: 'Boy 3',
+        skyColor: '#93C5FD',
+        groundColor: '#2E9B47',
+        thoughtHtml: `It’s <span class="text-red-600">kind of</span> cloudy.`,
+        thoughtSpeech: "It's kind of cloudy. Dress the child with the correct clothing for cloudy weather.",
+        instruction: 'Dress the child with the correct clothing for cloudy weather.',
+        wardrobe: [
+          'shirt_teal_floral', 'dress_pink_simple', 'bow_pink',
+          'tshirt_bear', 'skirt_floral', 'sneakers_pink',
+          'shorts_red', 'shorts_grey'
+        ],
+        wrongReasons: {},
+        checkComplete: (worn) => {
+          const hasOutfit = Boolean(worn.dress) || (Boolean(worn.top) && Boolean(worn.bottom));
+          const hasShoes = worn.shoes === 'sneakers_pink';
+          const isComplete = hasOutfit && hasShoes;
+          const missing = [];
+          if (!hasOutfit) missing.push('a top + bottom (or dress)');
+          if (!hasShoes) missing.push('sneakers');
+          return {
+            isComplete,
+            missingHint: missing.length ? `Still needed: ${missing.join(' + ')}` : ''
+          };
+        }
+      }
+    ];
+
+    /*************************************************************************
+     * 4. GLOBAL GAME STATE & NAVIGATION HELPERS
+     *************************************************************************/
+    let currentSlideIndex = 0;
+    let completedLevels = new Set();
+    let wornOutfit = {
+      top: null,
+      outerwear: null,
+      bottom: null,
+      dress: null,
+      socks: null,
+      shoes: null,
+      accessory: null,
+      headwear: null
+    };
+    let characterReaction = 'normal';
+    let feedbackMessage = null;
+    let hasFailedCurrentLevel = false;
+    let thoughtBubbleVisible = false;
+    let hideVocabLabels = false;
+    let activeVocabBannerHTML = null;
+    let bounceTimeout = null;
+    let introTimeout = null;
+
+    // Multi-stage "Find It!" Quiz State:
+    // 'idle' | 'reviewing' (speaks & pulses each item) | 'quiz_intro' | 'quizzing' (random queue of all 11) | 'completed'
+    let vocabQuizState = 'idle';
+    let vocabFlowSessionId = 0;
+    let vocabReviewIndex = -1;
+    let vocabReviewSubphase = 'listen'; // 'listen' | 'repeat'
+    let vocabQuizQueue = [];
+    let vocabQuizFound = new Set();
+    let vocabQuizTarget = null;
+    let vocabQuizPraiseText = null;
+    let vocabFlowTimer = null;
+
+    function stopVocabQuizFlow() {
+      vocabFlowSessionId++;
+      if (vocabFlowTimer) {
+        clearTimeout(vocabFlowTimer);
+        vocabFlowTimer = null;
+      }
+      if (speechQueueTimer) {
+        clearTimeout(speechQueueTimer);
+        speechQueueTimer = null;
+      }
+      activeSpeechToken++;
+      isAudioSpeaking = false;
+      vocabQuizState = 'idle';
+      vocabReviewIndex = -1;
+      vocabReviewSubphase = 'listen';
+      vocabQuizQueue = [];
+      vocabQuizFound.clear();
+      vocabQuizTarget = null;
+      vocabQuizPraiseText = null;
+      if ('speechSynthesis' in window) {
+        try { window.speechSynthesis.cancel(); } catch (e) {}
+      }
+    }
+
+    function getDefaultWeatherReaction(weatherKey) {
+      const map = {
+        sunny: 'sweat',
+        rainy: 'rain_react',
+        snowy: 'shiver',
+        windy: 'wind_react',
+        cloudy: 'cloudy_react'
+      };
+      return map[weatherKey] || 'normal';
+    }
+
+    function playWeatherIntroSequence(lvl) {
+      if (introTimeout) clearTimeout(introTimeout);
+      // Step 1: Character visibly reacts to the weather first!
+      characterReaction = getDefaultWeatherReaction(lvl.weatherKey);
+      thoughtBubbleVisible = false;
+      renderScreenContent(lvl);
+
+      // Step 2: After a moment of reacting, pop in their thought bubble & speak the phrase
+      introTimeout = setTimeout(() => {
+        thoughtBubbleVisible = true;
+        renderScreenContent(lvl);
+        if (lvl.thoughtSpeech) {
+          speakText(lvl.thoughtSpeech);
+        }
+      }, 750);
+    }
+
+    function switchSlide(index) {
+      if (bounceTimeout) clearTimeout(bounceTimeout);
+      if (introTimeout) clearTimeout(introTimeout);
+      stopVocabQuizFlow();
+      currentSlideIndex = index;
+      const lvl = LEVELS[currentSlideIndex];
+
+      // Reset outfit & state for the selected slide
+      wornOutfit = {
+        top: null,
+        outerwear: null,
+        bottom: null,
+        dress: null,
+        socks: null,
+        shoes: null,
+        accessory: null,
+        headwear: null
+      };
+      characterReaction = lvl.type === 'dressup' ? getDefaultWeatherReaction(lvl.weatherKey) : 'normal';
+      feedbackMessage = null;
+      hasFailedCurrentLevel = false;
+      thoughtBubbleVisible = false;
+      activeVocabBannerHTML = null;
+
+      // Update stage sky & ground colors
+      const stageWrapper = document.getElementById('stageWrapper');
+      const groundLayer = document.getElementById('groundLayer');
+      if (stageWrapper) stageWrapper.style.backgroundColor = lvl.skyColor;
+      if (groundLayer) groundLayer.style.backgroundColor = lvl.groundColor;
+
+      renderNavigation();
+      updateStarCounter();
+      renderWeatherSky(lvl);
+
+      if (lvl.type === 'dressup') {
+        playWeatherIntroSequence(lvl);
+      } else {
+        renderScreenContent(lvl);
+      }
+    }
+
+    function renderNavigation() {
+      const nav = document.getElementById('slideNav');
+      if (!nav) return;
+      nav.innerHTML = LEVELS.map((lvl, idx) => {
+        const isActive = idx === currentSlideIndex;
+        const isDone = completedLevels.has(lvl.id);
+        return `
+          <button
+            onclick="switchSlide(${idx})"
+            class="cartoon-pill px-2.5 sm:px-3 py-1 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-1 shrink-0 transition-colors ${
+              isActive
+                ? 'bg-amber-400 text-gray-900'
+                : isDone
+                  ? 'bg-emerald-100 text-emerald-900 hover:bg-emerald-200'
+                  : 'bg-slate-100 text-gray-700 hover:bg-slate-200'
+            }"
+          >
+            <span>${lvl.tabLabel}</span>
+            ${isDone ? `
+              <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-amber-600 fill-amber-400" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+            ` : ''}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function updateStarCounter() {
+      const el = document.getElementById('starCountText');
+      if (el) {
+        el.textContent = `${completedLevels.size} / ${LEVELS.length}`;
+      }
+    }
+
+    /*************************************************************************
+     * 5. DYNAMIC WEATHER SKY & TREE BACKGROUND RENDERER
+     *************************************************************************/
+    function renderWeatherSky(lvl) {
+      const sky = document.getElementById('weatherSkyLayer');
+      if (!sky) return;
+
+      // Tree on the left for Dress-Up levels (sways on windy level)
+      const treeSVG = lvl.type === 'dressup' ? `
+        <svg viewBox="0 0 260 460" class="absolute -left-12 sm:-left-6 bottom-16 sm:bottom-20 w-48 sm:w-64 h-auto pointer-events-none opacity-95 ${lvl.weatherKey === 'windy' ? 'tree-wind-sway' : ''}">
+          <!-- Tree Trunk -->
+          <path d="M88,450 Q105,340 102,240 L72,195 L86,182 L108,212 L114,175 L134,175 L134,220 L166,185 L180,200 L142,245 Q140,340 162,450 Z"
+                fill="#92400E" stroke="#111827" stroke-width="5" stroke-linejoin="round"/>
+          <!-- Lush Green Canopy -->
+          <path d="M40,220 C10,195 12,140 48,122 C42,75 88,45 126,62 C164,40 212,72 204,118 C238,138 236,192 200,216 C188,242 152,248 124,236 C96,248 56,242 40,220 Z"
+                fill="#22C55E" stroke="#111827" stroke-width="5" stroke-linejoin="round"/>
+          <!-- Canopy Highlight Puff -->
+          <path d="M68,118 Q104,88 148,108" fill="none" stroke="#4ADE80" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+      ` : '';
+
+      let weatherDecor = '';
+
+      if (lvl.weatherKey === 'sunny') {
+        weatherDecor = `
+          <!-- Pulsing Golden Heat Halo -->
+          <div class="sun-glow absolute -top-20 -right-20 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-amber-300/55 blur-xl pointer-events-none"></div>
+          <!-- Radiating Cartoon Sun -->
+          <svg viewBox="0 0 220 220" class="animate-sun absolute -top-12 -right-12 w-44 h-44 sm:w-60 sm:h-60">
+            <g stroke="#111827" stroke-width="4.5" stroke-linejoin="round">
+              <polygon points="110,6 126,38 158,16 156,54 194,48 174,82 212,94 178,118 206,146 168,152 178,190 142,176 132,212 110,182 88,212 78,176 42,190 52,152 14,146 42,118 8,94 46,82 26,48 64,54 62,16 94,38"
+                       fill="#FDE047"/>
+              <circle cx="110" cy="110" r="56" fill="#FACC15"/>
+            </g>
+          </svg>
+        `;
+      } else if (lvl.weatherKey === 'rainy') {
+        const drops = Array.from({ length: 28 }).map((_, i) => {
+          const left = 6 + (i * 3.4) % 90;
+          const delay = (i * 0.13) % 0.85;
+          const dur = 0.72 + (i % 3) * 0.12;
+          return `<div class="raindrop absolute top-10 w-1 sm:w-1.5 h-6 sm:h-8 rounded-full bg-sky-200 border border-sky-700" style="left:${left}%; animation-delay:${delay}s; animation-duration:${dur}s;"></div>`;
+        }).join('');
+        const splashes = Array.from({ length: 8 }).map((_, i) => {
+          const left = 10 + (i * 10.5) % 82;
+          const delay = (i * 0.21) % 0.85;
+          return `<div class="rain-splash absolute bottom-[78px] sm:bottom-[92px] w-8 h-2.5 rounded-full border-2 border-sky-200 bg-sky-300/50" style="left:${left}%; animation-delay:${delay}s;"></div>`;
+        }).join('');
+        weatherDecor = `
+          <!-- Heavy Dark Rain Clouds Across Top (Fluffy Multi-Puff SVG Clouds) -->
+          <div class="absolute -top-3 left-0 right-0 flex justify-around items-start opacity-95 pointer-events-none">
+            <svg viewBox="0 0 240 110" class="w-48 sm:w-64 h-auto -ml-4 drop-shadow-md">
+              <path d="M35,88 Q12,88 12,66 Q12,46 32,44 Q40,18 72,18 Q98,18 112,34 Q128,16 156,18 Q186,20 192,46 Q218,48 218,70 Q218,88 192,88 Z"
+                    fill="#475569" stroke="#111827" stroke-width="5" stroke-linejoin="round"/>
+              <path d="M38,76 Q115,82 190,76" fill="none" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+            </svg>
+            <svg viewBox="0 0 240 110" class="w-52 sm:w-72 h-auto -ml-10 mt-1 drop-shadow-md">
+              <path d="M35,88 Q12,88 12,66 Q12,46 32,44 Q40,18 72,18 Q98,18 112,34 Q128,16 156,18 Q186,20 192,46 Q218,48 218,70 Q218,88 192,88 Z"
+                    fill="#334155" stroke="#111827" stroke-width="5" stroke-linejoin="round"/>
+            </svg>
+            <svg viewBox="0 0 240 110" class="w-48 sm:w-64 h-auto -ml-10 drop-shadow-md">
+              <path d="M35,88 Q12,88 12,66 Q12,46 32,44 Q40,18 72,18 Q98,18 112,34 Q128,16 156,18 Q186,20 192,46 Q218,48 218,70 Q218,88 192,88 Z"
+                    fill="#475569" stroke="#111827" stroke-width="5" stroke-linejoin="round"/>
+            </svg>
+            <svg viewBox="0 0 240 110" class="w-48 sm:w-64 h-auto -ml-10 hidden sm:block drop-shadow-md">
+              <path d="M35,88 Q12,88 12,66 Q12,46 32,44 Q40,18 72,18 Q98,18 112,34 Q128,16 156,18 Q186,20 192,46 Q218,48 218,70 Q218,88 192,88 Z"
+                    fill="#334155" stroke="#111827" stroke-width="5" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          ${drops}
+          ${splashes}
+        `;
+      } else if (lvl.weatherKey === 'snowy') {
+        const flakes = Array.from({ length: 22 }).map((_, i) => {
+          const left = 4 + (i * 4.3) % 92;
+          const delay = (i * 0.23) % 3.1;
+          const sizePx = i % 3 === 0 ? 'w-5 h-5' : (i % 2 === 0 ? 'w-4 h-4' : 'w-3 h-3');
+          return `
+            <div class="snowflake absolute top-8 ${sizePx} rounded-full bg-white border-2 border-sky-400 shadow-sm" style="left:${left}%; animation-delay:${delay}s;"></div>
+          `;
+        }).join('');
+        weatherDecor = `
+          <!-- Fluffy Winter Snow Clouds (SVG) -->
+          <div class="absolute -top-3 left-0 right-0 flex justify-around items-start pointer-events-none">
+            <svg viewBox="0 0 240 110" class="w-48 sm:w-64 h-auto -ml-4 drop-shadow-sm">
+              <path d="M35,88 Q12,88 12,66 Q12,46 32,44 Q40,18 72,18 Q98,18 112,34 Q128,16 156,18 Q186,20 192,46 Q218,48 218,70 Q218,88 192,88 Z"
+                    fill="#FFFFFF" stroke="#475569" stroke-width="4.5" stroke-linejoin="round"/>
+            </svg>
+            <svg viewBox="0 0 240 110" class="w-52 sm:w-72 h-auto -ml-10 mt-1 drop-shadow-sm">
+              <path d="M35,88 Q12,88 12,66 Q12,46 32,44 Q40,18 72,18 Q98,18 112,34 Q128,16 156,18 Q186,20 192,46 Q218,48 218,70 Q218,88 192,88 Z"
+                    fill="#F8FAFC" stroke="#475569" stroke-width="4.5" stroke-linejoin="round"/>
+            </svg>
+            <svg viewBox="0 0 240 110" class="w-48 sm:w-64 h-auto -ml-10 drop-shadow-sm">
+              <path d="M35,88 Q12,88 12,66 Q12,46 32,44 Q40,18 72,18 Q98,18 112,34 Q128,16 156,18 Q186,20 192,46 Q218,48 218,70 Q218,88 192,88 Z"
+                    fill="#FFFFFF" stroke="#475569" stroke-width="4.5" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <!-- Snowdrifts on Ground -->
+          <div class="absolute bottom-[74px] sm:bottom-[88px] left-0 right-0 flex justify-between pointer-events-none">
+            <div class="w-64 h-12 bg-white rounded-t-full border-t-4 border-gray-900"></div>
+            <div class="w-80 h-14 bg-white rounded-t-full border-t-4 border-gray-900"></div>
+            <div class="w-72 h-12 bg-white rounded-t-full border-t-4 border-gray-900"></div>
+          </div>
+          ${flakes}
+        `;
+      } else if (lvl.weatherKey === 'windy') {
+        const leaves = Array.from({ length: 9 }).map((_, i) => {
+          const top = 12 + (i * 9) % 62;
+          const delay = (i * 0.42) % 3.2;
+          const leafColor = i % 2 === 0 ? '#22C55E' : '#F59E0B';
+          return `
+            <div class="wind-leaf absolute left-0 w-7 h-7 select-none" style="top:${top}%; animation-delay:${delay}s;">
+              <svg viewBox="0 0 24 24" class="w-full h-full">
+                <path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66l.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75" fill="${leafColor}" stroke="#111827" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          `;
+        }).join('');
+        weatherDecor = `
+          <svg viewBox="0 0 850 260" class="w-full h-60 mt-1 wind-swirl">
+            <!-- Prominent White & Dark Wind Gust Streamlines -->
+            <path d="M90,55 Q230,15 310,55 C345,75 310,115 280,90 C265,75 295,50 320,65" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity="0.8"/>
+            <path d="M90,55 Q230,15 310,55 C345,75 310,115 280,90 C265,75 295,50 320,65" fill="none" stroke="#111827" stroke-width="4" stroke-linecap="round"/>
+
+            <path d="M350,85 Q490,35 575,80 C615,105 575,150 540,120 C525,105 555,75 585,92" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity="0.8"/>
+            <path d="M350,85 Q490,35 575,80 C615,105 575,150 540,120 C525,105 555,75 585,92" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+            <path d="M350,85 Q490,35 575,80 C615,105 575,150 540,120 C525,105 555,75 585,92" fill="none" stroke="#111827" stroke-width="4" stroke-linecap="round"/>
+
+            <path d="M560,45 Q690,10 760,55 C795,80 760,120 730,95" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity="0.8"/>
+            <path d="M560,45 Q690,10 760,55 C795,80 760,120 730,95" fill="none" stroke="#111827" stroke-width="4" stroke-linecap="round"/>
+
+            <path d="M160,155 Q330,125 420,165 C455,185 425,220 395,198" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" opacity="0.75"/>
+            <path d="M160,155 Q330,125 420,165 C455,185 425,220 395,198" fill="none" stroke="#111827" stroke-width="3.5" stroke-linecap="round"/>
+          </svg>
+          ${leaves}
+        `;
+      } else if (lvl.weatherKey === 'cloudy') {
+        weatherDecor = `
+          <!-- Soft Overcast Sky Gradient Overlay -->
+          <div class="absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-slate-300/55 via-slate-200/25 to-transparent pointer-events-none"></div>
+
+          <!-- Prominent, Fluffy Multi-Puff Cartoon Clouds Drifting Across the Sky -->
+          <div class="absolute top-1 left-4 right-4 flex justify-around items-start pointer-events-none">
+            <!-- Cloud 1 (Left) -->
+            <div class="cloud-drift relative">
+              <svg viewBox="0 0 260 130" class="w-44 sm:w-60 md:w-68 h-auto drop-shadow-md">
+                <!-- Soft Cloud Under-Shadow -->
+                <path d="M48,108 Q22,108 22,84 Q22,62 44,58 Q54,28 88,28 Q116,28 132,46 Q150,24 180,26 Q212,28 218,58 Q244,60 244,86 Q244,108 216,108 Z"
+                      fill="#CBD5E1" transform="translate(6, 7)"/>
+                <!-- Main Fluffy White Cloud Body -->
+                <path d="M48,108 Q22,108 22,84 Q22,62 44,58 Q54,28 88,28 Q116,28 132,46 Q150,24 180,26 Q212,28 218,58 Q244,60 244,86 Q244,108 216,108 Z"
+                      fill="#FFFFFF" stroke="#111827" stroke-width="5" stroke-linejoin="round"/>
+                <!-- Inner Fluffy Puff Contours -->
+                <path d="M58,64 Q76,48 96,62 M126,54 Q152,38 176,56 M172,72 Q196,62 212,78"
+                      fill="none" stroke="#E2E8F0" stroke-width="4.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+
+            <!-- Cloud 2 (Center - Sun Peeking Behind Big Overcast Cloud) -->
+            <div class="cloud-drift relative mt-2 sm:mt-4" style="animation-delay:1.1s">
+              <svg viewBox="0 0 290 145" class="w-52 sm:w-72 md:w-80 h-auto drop-shadow-md">
+                <!-- Muted Sun Peeking Behind Cloud -->
+                <circle cx="215" cy="46" r="28" fill="#FDE047" stroke="#111827" stroke-width="4" opacity="0.9"/>
+                <!-- Soft Cloud Under-Shadow -->
+                <path d="M48,118 Q18,118 18,90 Q18,66 44,62 Q56,28 96,28 Q128,28 146,48 Q166,24 200,26 Q236,28 242,62 Q270,64 270,92 Q270,118 238,118 Z"
+                      fill="#94A3B8" transform="translate(6, 8)"/>
+                <!-- Main Fluffy Cloud -->
+                <path d="M48,118 Q18,118 18,90 Q18,66 44,62 Q56,28 96,28 Q128,28 146,48 Q166,24 200,26 Q236,28 242,62 Q270,64 270,92 Q270,118 238,118 Z"
+                      fill="#F8FAFC" stroke="#111827" stroke-width="5" stroke-linejoin="round"/>
+                <!-- Greyish-Blue Overcast Cloud Belly Shading -->
+                <path d="M36,102 Q140,112 250,102" fill="none" stroke="#CBD5E1" stroke-width="10" stroke-linecap="round"/>
+                <path d="M68,68 Q94,50 118,68 M148,58 Q178,40 206,62"
+                      fill="none" stroke="#CBD5E1" stroke-width="4.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+
+            <!-- Cloud 3 (Right) -->
+            <div class="cloud-drift relative" style="animation-delay:2.1s">
+              <svg viewBox="0 0 260 130" class="w-44 sm:w-64 md:w-72 h-auto drop-shadow-md">
+                <path d="M48,108 Q22,108 22,84 Q22,62 44,58 Q54,28 88,28 Q116,28 132,46 Q150,24 180,26 Q212,28 218,58 Q244,60 244,86 Q244,108 216,108 Z"
+                      fill="#CBD5E1" transform="translate(6, 7)"/>
+                <path d="M48,108 Q22,108 22,84 Q22,62 44,58 Q54,28 88,28 Q116,28 132,46 Q150,24 180,26 Q212,28 218,58 Q244,60 244,86 Q244,108 216,108 Z"
+                      fill="#FFFFFF" stroke="#111827" stroke-width="5" stroke-linejoin="round"/>
+                <path d="M42,95 Q132,104 224,95" fill="none" stroke="#E2E8F0" stroke-width="8" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Lower Secondary Drifting Clouds for Extra Cloudy Depth -->
+          <div class="absolute top-24 sm:top-28 left-1/4 right-12 flex justify-between items-center pointer-events-none opacity-90">
+            <div class="cloud-drift" style="animation-delay:0.6s">
+              <svg viewBox="0 0 220 105" class="w-36 sm:w-48 h-auto">
+                <path d="M38,88 Q16,88 16,68 Q16,50 34,46 Q44,22 74,22 Q100,22 114,38 Q130,20 156,22 Q182,24 188,48 Q208,50 208,70 Q208,88 184,88 Z"
+                      fill="#F1F5F9" stroke="#111827" stroke-width="4.5" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="cloud-drift hidden sm:block" style="animation-delay:1.7s">
+              <svg viewBox="0 0 220 105" class="w-40 sm:w-52 h-auto">
+                <path d="M38,88 Q16,88 16,68 Q16,50 34,46 Q44,22 74,22 Q100,22 114,38 Q130,20 156,22 Q182,24 188,48 Q208,50 208,70 Q208,88 184,88 Z"
+                      fill="#F1F5F9" stroke="#111827" stroke-width="4.5" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        `;
+      }
+
+      sky.innerHTML = `${treeSVG}${weatherDecor}`;
+    }
+
+    /*************************************************************************
+     * 6. SOFT-SHADED KAWAII STORYBOOK MULTI-LAYERED SVG CHARACTER ENGINE
+     *    Renders 3 Girls & 3 Boys in strict alternating order:
+     *    1. Girl 1 (Mia)  -> 2. Boy 1 (Leo)  -> 3. Girl 2 (Hana)
+     *    4. Boy 2 (Noah)  -> 5. Girl 3 (Sora) -> 6. Boy 3 (Kai)
+     *    Every character has both a lush BACK HAIR layer and a full,
+     *    forehead-covering FRONT HAIR + SIDE-LOCKS + TOP ACCESSORY layer!
+     *************************************************************************/
+    const CHARACTER_PROFILES = {
+      girl_1: {
+        name: 'Mia',
+        gender: 'girl',
+        hairLight: '#FEF08A',
+        hairMain: '#F59E0B',
+        hairDark: '#B45309',
+        eyeTop: '#0284C7',
+        eyeBot: '#7DD3FC',
+        tankFill: '#FFFBEB',
+        briefsFill: '#FDE047',
+        tankStars: false
+      },
+      boy_1: {
+        name: 'Leo',
+        gender: 'boy',
+        hairLight: '#FEF9C3',
+        hairMain: '#FACC15',
+        hairDark: '#CA8A04',
+        eyeTop: '#047857',
+        eyeBot: '#6EE7B7',
+        tankFill: '#FFFFFF',
+        briefsFill: '#7DD3FC',
+        tankStars: false
+      },
+      girl_2: {
+        name: 'Hana',
+        gender: 'girl',
+        hairLight: '#FED7AA',
+        hairMain: '#F97316',
+        hairDark: '#9A3412',
+        eyeTop: '#0F766E',
+        eyeBot: '#5EEAD4',
+        tankFill: '#E0F2FE',
+        briefsFill: '#FBCFE8',
+        tankStars: true
+      },
+      boy_2: {
+        name: 'Noah',
+        gender: 'boy',
+        hairLight: '#D97706',
+        hairMain: '#78350F',
+        hairDark: '#451A03',
+        eyeTop: '#1D4ED8',
+        eyeBot: '#93C5FD',
+        tankFill: '#BAE6FD',
+        briefsFill: '#FDE047',
+        tankStars: true
+      },
+      girl_3: {
+        name: 'Sora',
+        gender: 'girl',
+        hairLight: '#F472B6',
+        hairMain: '#9D174D',
+        hairDark: '#500724',
+        eyeTop: '#6D28D9',
+        eyeBot: '#DDD6FE',
+        tankFill: '#FCE7F3',
+        briefsFill: '#C4B5FD',
+        tankStars: true
+      },
+      boy_3: {
+        name: 'Kai',
+        gender: 'boy',
+        hairLight: '#818CF8',
+        hairMain: '#312E81',
+        hairDark: '#1E1B4B',
+        eyeTop: '#B45309',
+        eyeBot: '#FDE047',
+        tankFill: '#FFFFFF',
+        briefsFill: '#6EE7B7',
+        tankStars: false
+      }
+    };
+
+    // Outfit state for Mia on Slide 1 so she models any clicked vocabulary card
+    let vocabPreviewOutfit = {
+      top: null,
+      outerwear: null,
+      bottom: null,
+      dress: 'dress_ruffle_yellow',
+      socks: null,
+      shoes: 'sandals_blue',
+      accessory: null,
+      headwear: null
+    };
+
+    // Returns { hairBack, hairFront, headAccessories } for each of the 6 unique characters
+    function getKawaiiHairLayers(charType, gradId) {
+      const STROKE = '#3B2316';
+
+      if (charType === 'girl_1') {
+        // GIRL 1 (Mia): Voluminous golden-blonde curly ringlets + full curly bangs + pink bow + pearl earrings
+        const hairBack = `
+          <g id="mia-hair-back" fill="url(#${gradId})" stroke="${STROKE}" stroke-width="3.2" stroke-linejoin="round">
+            <!-- Big bouncy cloud of golden curls behind head and shoulders -->
+            <circle cx="68" cy="88" r="28"/>
+            <circle cx="54" cy="122" r="30"/>
+            <circle cx="58" cy="158" r="28"/>
+            <circle cx="72" cy="188" r="25"/>
+            <circle cx="192" cy="88" r="28"/>
+            <circle cx="206" cy="122" r="30"/>
+            <circle cx="202" cy="158" r="28"/>
+            <circle cx="188" cy="188" r="25"/>
+            <circle cx="96" cy="54" r="30"/>
+            <circle cx="164" cy="54" r="30"/>
+            <circle cx="130" cy="46" r="34"/>
+            <!-- Inner spiral curl details -->
+            <path d="M46,118 Q56,108 64,120 Q56,132 48,124" fill="none" stroke="#B45309" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M214,118 Q204,108 196,120 Q204,132 212,124" fill="none" stroke="#B45309" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M52,158 Q62,148 68,160" fill="none" stroke="#B45309" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M208,158 Q198,148 192,160" fill="none" stroke="#B45309" stroke-width="2.2" stroke-linecap="round"/>
+          </g>
+        `;
+        const hairFront = `
+          <g id="mia-hair-front">
+            <!-- Cheek-framing spiral ringlets -->
+            <path d="M84,78 Q62,96 66,126 Q70,152 84,162 Q92,146 86,122 Q88,98 92,86 Z"
+                  fill="url(#${gradId})" stroke="${STROKE}" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M176,78 Q198,96 194,126 Q190,152 176,162 Q168,146 174,122 Q172,98 168,86 Z"
+                  fill="url(#${gradId})" stroke="${STROKE}" stroke-width="3" stroke-linejoin="round"/>
+            <!-- Full scalloped curly forehead bangs overlapping y=44..98 -->
+            <path d="M78,94 C74,54 102,42 130,42 C158,42 186,54 182,94
+                     Q170,78 158,92 Q144,74 130,90 Q116,74 102,92 Q90,78 78,94 Z"
+                  fill="url(#${gradId})" stroke="${STROKE}" stroke-width="3.2" stroke-linejoin="round"/>
+            <!-- Glossy anime hair highlight ribbon -->
+            <path d="M96,66 Q130,52 164,66" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity="0.65"/>
+            <!-- Cute Pink Hair Bow on Mia's curls -->
+            <g transform="translate(86, 54) rotate(-18)">
+              <path d="M0,0 C-18,-14 -18,14 0,4 Z" fill="#F472B6" stroke="${STROKE}" stroke-width="2.5" stroke-linejoin="round"/>
+              <path d="M4,0 C22,-14 22,14 4,4 Z" fill="#F472B6" stroke="${STROKE}" stroke-width="2.5" stroke-linejoin="round"/>
+              <circle cx="2" cy="2" r="4.5" fill="#EC4899" stroke="${STROKE}" stroke-width="2.2"/>
+            </g>
+            <!-- Pearl Earrings -->
+            <circle cx="77" cy="120" r="4.8" fill="#FFFFFF" stroke="${STROKE}" stroke-width="2"/>
+            <circle cx="183" cy="120" r="4.8" fill="#FFFFFF" stroke="${STROKE}" stroke-width="2"/>
+          </g>
+        `;
+        return { hairBack, hairFront };
+      }
+
+      if (charType === 'boy_1') {
+        // BOY 1 (Leo - Sunny): Bright sunny-gold spiky layered boy hair with full swept bangs & bouncy cowlick
+        const hairBack = `
+          <g id="leo-hair-back" fill="url(#${gradId})" stroke="${STROKE}" stroke-width="3.2" stroke-linejoin="round">
+            <path d="M74,102 L58,86 L74,72 L64,52 L92,50 L106,34 L130,42 L154,34 L168,50 L196,52 L186,72 L202,86 L186,102 Z"/>
+          </g>
+        `;
+        const hairFront = `
+          <g id="leo-hair-front">
+            <!-- Big bouncy sunny spiky bangs covering forehead + sideburns + ahoge cowlick -->
+            <path d="M78,104 L72,82 C72,48 100,40 130,40
+                     Q136,20 156,24 Q144,34 148,42
+                     C174,44 188,56 184,84 L182,104
+                     L172,88 L166,98 L152,80 L138,98 L124,78 L108,98 L94,82 L86,96 Z"
+                  fill="url(#${gradId})" stroke="${STROKE}" stroke-width="3.2" stroke-linejoin="round"/>
+            <!-- Glossy hair highlight -->
+            <path d="M98,64 Q130,50 162,64" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+          </g>
+        `;
+        return { hairBack, hairFront };
+      }
+
+      if (charType === 'girl_2') {
+        // GIRL 2 (Hana - Rainy): Strawberry-ginger high bouncy twin pigtails with star clips & full hime bangs
+        const hairBack = `
+          <g id="hana-hair-back" fill="url(#${gradId})" stroke="${STROKE}" stroke-width="3.2" stroke-linejoin="round">
+            <!-- Left High Bouncy Pigtail -->
+            <path d="M82,68 C42,52 22,88 30,136 C34,158 54,168 68,152 C60,132 66,102 84,86 Z"/>
+            <!-- Right High Bouncy Pigtail -->
+            <path d="M178,68 C218,52 238,88 230,136 C226,158 206,168 192,152 C200,132 194,102 176,86 Z"/>
+            <!-- Back crown -->
+            <ellipse cx="130" cy="74" rx="54" ry="36"/>
+          </g>
+        `;
+        const hairFront = `
+          <g id="hana-hair-front">
+            <!-- Cute cheek-framing side locks -->
+            <path d="M82,84 C72,108 72,138 84,156 C90,142 88,116 92,92 Z"
+                  fill="url(#${gradId})" stroke="${STROKE}" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M178,84 C188,108 188,138 176,156 C170,142 172,116 168,92 Z"
+                  fill="url(#${gradId})" stroke="${STROKE}" stroke-width="3" stroke-linejoin="round"/>
+            <!-- Full rounded Hime fringe bangs across forehead -->
+            <path d="M78,94 C76,52 100,40 130,40 C160,40 184,52 182,94
+                     Q162,92 150,96 L144,82 L138,96 Q130,98 122,96 L116,82 L110,96 Q98,92 78,94 Z"
+                  fill="url(#${gradId})" stroke="${STROKE}" stroke-width="3.2" stroke-linejoin="round"/>
+            <!-- Glossy highlight -->
+            <path d="M96,66 Q130,54 164,66" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+            <!-- Twin Yellow Star Hair Clips -->
+            <polygon points="78,60 81,67 89,67 83,72 85,79 78,75 71,79 73,72 67,67 75,67"
+                     fill="#FACC15" stroke="${STROKE}" stroke-width="2.2" stroke-linejoin="round"/>
+            <polygon points="182,60 185,67 193,67 187,72 189,79 182,75 175,79 177,72 171,67 179,67"
+                     fill="#FACC15" stroke="${STROKE}" stroke-width="2.2" stroke-linejoin="round"/>
+          </g>
+        `;
+        return { hairBack, hairFront };
+      }
+
+      if (charType === 'boy_2') {
+        // BOY 2 (Noah - Snowy): Fluffy, thick chocolate-brown layered boy cut with warm ear tufts & double sprout
+        const hairBack = `
+          <g id="noah-hair-back" fill="url(#${gradId})" stroke="${STROKE}" stroke-width="3.2" stroke-linejoin="round">
+            <ellipse cx="130" cy="82" rx="60" ry="44"/>
+          </g>
+        `;
+        const hairFront = `
+          <g id="noah-hair-front">
+            <!-- Fluffy thick chocolate fringe covering forehead & warm ear tufts -->
+            <path d="M74,108 C68,78 76,42 130,40
+                     Q126,24 114,26 Q128,30 134,40
+                     Q142,24 152,28 Q144,34 142,40
+                     C184,42 192,78 186,108
+                     L176,94 L172,102 C158,90 148,98 134,98
+                     L128,86 L120,98 C106,96 96,88 88,102 L84,94 Z"
+                  fill="url(#${gradId})" stroke="${STROKE}" stroke-width="3.2" stroke-linejoin="round"/>
+            <!-- Soft caramel hair shine -->
+            <path d="M94,68 Q130,54 166,68" fill="none" stroke="#FDE68A" stroke-width="3.8" stroke-linecap="round" opacity="0.5"/>
+          </g>
+        `;
+        return { hairBack, hairFront };
+      }
+
+      if (charType === 'girl_3') {
+        // GIRL 3 (Sora - Windy): Twin round Odango buns with pink ribbon bows, wavy locks & parted bangs
+        const hairBack = `
+          <g id="sora-hair-back" fill="url(#${gradId})" stroke="${STROKE}" stroke-width="3.2" stroke-linejoin="round">
+            <!-- Twin Round Odango Buns on top -->
+            <circle cx="78" cy="52" r="24"/>
+            <circle cx="182" cy="52" r="24"/>
+            <!-- Flowing wavy back locks -->
+            <path d="M74,88 C52,114 54,156 68,180 C82,174 88,154 88,132 Z"/>
+            <path d="M186,88 C208,114 206,156 192,180 C178,174 172,154 172,132 Z"/>
+            <ellipse cx="130" cy="76" rx="52" ry="36"/>
+          </g>
+        `;
+        const hairFront = `
+          <g id="sora-hair-front">
+            <!-- Long wavy cheek-framing ribbons of hair -->
+            <path d="M82,82 C70,110 70,142 80,168 C88,152 88,122 92,94 Z"
+                  fill="url(#${gradId})" stroke="${STROKE}" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M178,82 C190,110 190,142 180,168 C172,152 172,122 168,94 Z"
+                  fill="url(#${gradId})" stroke="${STROKE}" stroke-width="3" stroke-linejoin="round"/>
+            <!-- Full parted bangs across forehead -->
+            <path d="M78,96 C76,52 100,40 130,40 C160,40 184,52 182,96
+                     Q164,84 146,96 Q134,80 130,74 Q126,80 114,96 Q96,84 78,96 Z"
+                  fill="url(#${gradId})" stroke="${STROKE}" stroke-width="3.2" stroke-linejoin="round"/>
+            <!-- Glossy highlight -->
+            <path d="M96,66 Q130,54 164,66" fill="none" stroke="#FFFFFF" stroke-width="3.8" stroke-linecap="round" opacity="0.55"/>
+            <!-- Cute Pink Ribbons under both Odango Buns -->
+            <g fill="#F472B6" stroke="${STROKE}" stroke-width="2.2">
+              <ellipse cx="70" cy="72" rx="9" ry="5" transform="rotate(-20 70 72)"/>
+              <ellipse cx="86" cy="72" rx="9" ry="5" transform="rotate(20 86 72)"/>
+              <circle cx="78" cy="72" r="4" fill="#EC4899"/>
+              <ellipse cx="174" cy="72" rx="9" ry="5" transform="rotate(-20 174 72)"/>
+              <ellipse cx="190" cy="72" rx="9" ry="5" transform="rotate(20 190 72)"/>
+              <circle cx="182" cy="72" r="4" fill="#EC4899"/>
+            </g>
+          </g>
+        `;
+        return { hairBack, hairFront };
+      }
+
+      // Default / BOY 3 (Kai - Cloudy): Wavy midnight-indigo tousled boy hair with side-swept fringe & top tuft
+      const hairBack = `
+        <g id="kai-hair-back" fill="url(#${gradId})" stroke="${STROKE}" stroke-width="3.2" stroke-linejoin="round">
+          <path d="M70,98 Q56,78 72,62 Q68,42 96,42 Q130,28 164,42 Q192,42 188,62 Q204,78 190,98 Z"/>
+        </g>
+      `;
+      const hairFront = `
+        <g id="kai-hair-front">
+          <!-- Tousled wavy side-swept bangs covering forehead + textured temple tufts -->
+          <path d="M76,104 C70,74 82,40 130,38
+                   Q142,20 162,28 Q148,34 150,40
+                   C182,44 190,74 184,104
+                   L174,88 L168,98 Q150,82 136,98 Q122,82 106,98 L92,84 L84,98 Z"
+                fill="url(#${gradId})" stroke="${STROKE}" stroke-width="3.2" stroke-linejoin="round"/>
+          <!-- Glossy cool highlight -->
+          <path d="M96,66 Q130,52 164,66" fill="none" stroke="#C7D2FE" stroke-width="4" stroke-linecap="round" opacity="0.65"/>
+        </g>
+      `;
+      return { hairBack, hairFront };
+    }
+
+    // Master Multi-Layered Kawaii Storybook SVG Character Renderer (Used by ALL 6 Slides!)
+    function buildKawaiiCharacterSVG(charType, worn, reaction, isVocabHost = false) {
+      const profile = CHARACTER_PROFILES[charType] || CHARACTER_PROFILES.girl_1;
+      const STROKE = '#3B2316';
+      const uid = `${charType}_${isVocabHost ? 'host' : 'play'}`;
+      const skinGradId = `skinGrad_${uid}`;
+      const hairGradId = `hairGrad_${uid}`;
+      const eyeGradId = `eyeGrad_${uid}`;
+      const cheekGradId = `cheekGrad_${uid}`;
+
+      const { hairBack, hairFront } = getKawaiiHairLayers(charType, hairGradId);
+
+      // Expressive mouth & reaction overlays
+      let mouthSVG = `
+        <path d="M120,129 Q130,139 140,129 Q130,132 120,129 Z" fill="#FB7185" stroke="${STROKE}" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M119,128 Q130,138 141,128" fill="none" stroke="${STROKE}" stroke-width="2.8" stroke-linecap="round"/>
+      `;
+      let reactionExtras = '';
+      let eyeSparkles = '';
+
+      if (reaction === 'shiver') {
+        mouthSVG = `
+          <rect x="118" y="127" width="24" height="9" rx="4.5" fill="#FFFFFF" stroke="${STROKE}" stroke-width="2.4"/>
+          <line x1="124" y1="127" x2="124" y2="136" stroke="${STROKE}" stroke-width="1.8"/>
+          <line x1="130" y1="127" x2="130" y2="136" stroke="${STROKE}" stroke-width="1.8"/>
+          <line x1="136" y1="127" x2="136" y2="136" stroke="${STROKE}" stroke-width="1.8"/>
+        `;
+        reactionExtras = `
+          <!-- Frosty Breath Puff & Shiver Lines -->
+          <ellipse cx="156" cy="134" rx="14" ry="8" fill="#E0F2FE" opacity="0.85" stroke="#38BDF8" stroke-width="1.5"/>
+          <circle cx="172" cy="130" r="5" fill="#E0F2FE" opacity="0.75"/>
+          <path d="M54,75 Q48,85 54,95 M46,80 Q40,90 46,100 M206,75 Q212,85 206,95 M214,80 Q220,90 214,100" fill="none" stroke="#0284C7" stroke-width="2.8" stroke-linecap="round"/>
+        `;
+      } else if (reaction === 'sweat') {
+        mouthSVG = `
+          <ellipse cx="130" cy="132" rx="8" ry="6" fill="#FB7185" stroke="${STROKE}" stroke-width="2.5"/>
+          <ellipse cx="130" cy="135" rx="5" ry="3.5" fill="#FDA4AF"/>
+        `;
+        reactionExtras = `
+          <!-- Extra Flushed Heat Cheeks & Sweat Drops -->
+          <circle cx="94" cy="122" r="16" fill="#FB7185" opacity="0.35"/>
+          <circle cx="166" cy="122" r="16" fill="#FB7185" opacity="0.35"/>
+          <path d="M176,78 C170,90 169,97 176,100 C183,97 182,90 176,78 Z" fill="#38BDF8" stroke="${STROKE}" stroke-width="2"/>
+          <path d="M82,86 C77,95 77,100 82,102 C87,100 87,95 82,86 Z" fill="#38BDF8" stroke="${STROKE}" stroke-width="1.8"/>
+          <path d="M196,62 C191,72 191,78 196,80 C201,78 201,72 196,62 Z" fill="#38BDF8" stroke="${STROKE}" stroke-width="1.8"/>
+        `;
+      } else if (reaction === 'rain_react') {
+        mouthSVG = `<path d="M119,134 Q130,125 141,134" fill="none" stroke="${STROKE}" stroke-width="2.8" stroke-linecap="round"/>`;
+        reactionExtras = `
+          <!-- Raindrops splashing off head -->
+          <path d="M88,42 C84,50 84,55 88,57 C92,55 92,50 88,42 Z" fill="#38BDF8" stroke="${STROKE}" stroke-width="1.8"/>
+          <path d="M172,46 C168,54 168,59 172,61 C176,59 176,54 172,46 Z" fill="#38BDF8" stroke="${STROKE}" stroke-width="1.8"/>
+          <path d="M62,64 C58,72 58,77 62,79 C66,77 66,72 62,64 Z" fill="#38BDF8" stroke="${STROKE}" stroke-width="1.8"/>
+        `;
+      } else if (reaction === 'wind_react') {
+        mouthSVG = `<ellipse cx="132" cy="132" rx="5.5" ry="5" fill="#FB7185" stroke="${STROKE}" stroke-width="2.5"/>`;
+        reactionExtras = `
+          <path d="M32,74 Q62,64 82,76 M26,92 Q56,84 74,94" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+        `;
+      } else if (reaction === 'cloudy_react') {
+        mouthSVG = `<circle cx="130" cy="132" r="4.5" fill="#FB7185" stroke="${STROKE}" stroke-width="2.4"/>`;
+        reactionExtras = '';
+      } else if (reaction === 'happy') {
+        mouthSVG = `
+          <path d="M117,126 Q130,128 143,126 Q141,143 130,143 Q119,143 117,126 Z" fill="#FB7185" stroke="${STROKE}" stroke-width="2.6" stroke-linejoin="round"/>
+          <path d="M123,136 Q130,142 137,136 Z" fill="#FDA4AF"/>
+        `;
+        eyeSparkles = `
+          <polygon points="108,98 110,103 115,105 110,107 108,112 106,107 101,105 106,103" fill="#FEF08A"/>
+          <polygon points="152,98 154,103 159,105 154,107 152,112 150,107 145,105 150,103" fill="#FEF08A"/>
+        `;
+        reactionExtras = `
+          <polygon points="56,64 59,72 67,75 59,78 56,86 53,78 45,75 53,72" fill="#FDE047" stroke="${STROKE}" stroke-width="1.5"/>
+          <polygon points="204,64 207,72 215,75 207,78 204,86 201,78 193,75 201,72" fill="#FDE047" stroke="${STROKE}" stroke-width="1.5"/>
+        `;
+      }
+
+      // Girl vs Boy eyelash details
+      const girlLashes = profile.gender === 'girl' ? `
+        <path d="M96,98 L90,93 M95,103 L89,101" stroke="${STROKE}" stroke-width="2.8" stroke-linecap="round"/>
+        <path d="M164,98 L170,93 M165,103 L171,101" stroke="${STROKE}" stroke-width="2.8" stroke-linecap="round"/>
+      ` : '';
+
+      // Gather worn clothing SVG layers in proper Z-order:
+      // 1. Socks -> 2. Bottom -> 3. Top -> 4. Dress -> 5. Outerwear -> 6. Shoes -> 7. Headwear -> 8. Accessory
+      const layerOrder = ['socks', 'bottom', 'top', 'dress', 'outerwear', 'shoes', 'headwear', 'accessory'];
+      const wornLayersSVG = layerOrder.map(slot => {
+        const itemId = worn[slot];
+        if (!itemId || !CLOTHING_DB[itemId]) return '';
+        const clickHandler = isVocabHost ? '' : `onclick="removeWornSlot('${slot}')"`;
+        const titleText = isVocabHost ? CLOTHING_DB[itemId].name : `Click to take off ${CLOTHING_DB[itemId].name}`;
+        return `<g class="clothing-layer-enter ${isVocabHost ? '' : 'cursor-pointer'}" ${clickHandler} title="${titleText}">${CLOTHING_DB[itemId].svg(true)}</g>`;
+      }).join('');
+
+      const reactionAnimMap = {
+        shiver: 'react-shiver',
+        sweat: 'react-sweat',
+        rain_react: 'react-rain',
+        wind_react: 'react-wind',
+        cloudy_react: 'react-cloudy',
+        happy: 'react-happy'
+      };
+      const animClass = reactionAnimMap[reaction] || 'kawaii-idle';
+
+      return `
+        <svg viewBox="0 0 260 440" class="w-full h-full max-h-[410px] drop-shadow-md select-none ${animClass}">
+          <defs>
+            <!-- Soft Airbrushed Mochi Skin Gradient -->
+            <radialGradient id="${skinGradId}" cx="45%" cy="38%" r="60%">
+              <stop offset="0%" stop-color="#FFF5ED"/>
+              <stop offset="68%" stop-color="#FFE1C9"/>
+              <stop offset="100%" stop-color="#F5C19F"/>
+            </radialGradient>
+            <!-- Rich 3-Stop Storybook Hair Gradient -->
+            <linearGradient id="${hairGradId}" x1="0%" y1="0%" x2="15%" y2="100%">
+              <stop offset="0%" stop-color="${profile.hairLight}"/>
+              <stop offset="48%" stop-color="${profile.hairMain}"/>
+              <stop offset="100%" stop-color="${profile.hairDark}"/>
+            </linearGradient>
+            <!-- Glossy Anime Iris Gradient -->
+            <linearGradient id="${eyeGradId}" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="${profile.eyeTop}"/>
+              <stop offset="100%" stop-color="${profile.eyeBot}"/>
+            </linearGradient>
+            <!-- Soft Rosy Blush Gradient -->
+            <radialGradient id="${cheekGradId}" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#FB7185" stop-opacity="0.65"/>
+              <stop offset="100%" stop-color="#FB7185" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+
+          <!-- Soft Ground Shadow -->
+          <ellipse cx="130" cy="427" rx="52" ry="9" fill="rgba(17, 24, 39, 0.18)"/>
+
+          <!-- 1. LUSH BACK HAIR LAYER (Behind head & shoulders) -->
+          ${hairBack}
+
+          <!-- 2. CHIBI ARMS, LEGS & TORSO -->
+          <g stroke="${STROKE}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+            <!-- Outstretched Welcoming Arms -->
+            <path d="M94,174 L38,232 L26,232 L24,239 L40,242 L42,250 L48,242 L96,198 Z" fill="url(#${skinGradId})"/>
+            <path d="M166,174 L222,232 L234,232 L236,239 L220,242 L218,250 L212,242 L164,198 Z" fill="url(#${skinGradId})"/>
+
+            <!-- Chibi Legs & Feet -->
+            <path d="M96,274 L88,412 L80,424 L110,424 L110,410 L122,282 Z" fill="url(#${skinGradId})"/>
+            <path d="M164,274 L172,412 L180,424 L150,424 L150,410 L138,282 Z" fill="url(#${skinGradId})"/>
+            <!-- Rosy Knee Blushes -->
+            <ellipse cx="105" cy="342" rx="6.5" ry="4" fill="#FB7185" opacity="0.3" stroke="none"/>
+            <ellipse cx="155" cy="342" rx="6.5" ry="4" fill="#FB7185" opacity="0.3" stroke="none"/>
+            <path d="M99,343 Q105,348 111,343 M149,343 Q155,348 161,343" fill="none" stroke="#C28E6E" stroke-width="2.2"/>
+
+            <!-- Base Undergarment Briefs -->
+            <path d="M94,262 L166,262 L168,282 L136,288 L124,288 L92,282 Z" fill="${profile.briefsFill}"/>
+
+            <!-- Base Camisole / Tank Top -->
+            <path d="M98,170 L110,170 Q130,188 150,170 L162,170 L166,262 L94,262 Z" fill="${profile.tankFill}"/>
+            ${profile.tankStars ? `<polygon points="130,204 134,214 145,214 136,220 139,230 130,224 121,230 124,220 115,214 126,214" fill="#FACC15" stroke="${STROKE}" stroke-width="1.6"/>` : ''}
+
+            <!-- Neck -->
+            <rect x="118" y="142" width="24" height="32" rx="8" fill="url(#${skinGradId})"/>
+          </g>
+
+          <!-- 3. LAYERED CLOTHING (Socks, Bottoms, Tops, Dresses, Jackets, Shoes) -->
+          ${wornLayersSVG}
+
+          <!-- 4. KAWAII CHIBI HEAD, MOCHI CHEEKS & GLOSSY ANIME EYES -->
+          <g id="kawaii-head">
+            <!-- Ears -->
+            <circle cx="80" cy="110" r="9.5" fill="url(#${skinGradId})" stroke="${STROKE}" stroke-width="3"/>
+            <circle cx="180" cy="110" r="9.5" fill="url(#${skinGradId})" stroke="${STROKE}" stroke-width="3"/>
+            <path d="M78,108 Q81,111 79,114 M182,108 Q179,111 181,114" fill="none" stroke="#D99B78" stroke-width="2" stroke-linecap="round"/>
+
+            <!-- Plush Chibi Mochi Head Shape -->
+            <path d="M82,96 C82,50 178,50 178,96 C181,132 164,154 130,154 C96,154 79,132 82,96 Z"
+                  fill="url(#${skinGradId})" stroke="${STROKE}" stroke-width="3.2" stroke-linejoin="round"/>
+
+            <!-- Soft Airbrushed Rosy Cheeks + Cute Anime Blush Lines -->
+            <circle cx="96" cy="122" r="14" fill="url(#${cheekGradId})"/>
+            <circle cx="164" cy="122" r="14" fill="url(#${cheekGradId})"/>
+            <path d="M92,121 L95,125 M98,121 L101,125 M159,121 L162,125 M165,121 L168,125"
+                  stroke="#F43F5E" stroke-width="1.8" stroke-linecap="round" opacity="0.55"/>
+
+            <!-- Large Multi-Layered Glossy Anime Eyes (with natural blink animation) -->
+            <g class="kawaii-eyes-blink">
+              ${girlLashes}
+              <!-- Left Eye -->
+              <ellipse cx="108" cy="106" rx="12.5" ry="13.5" fill="#FFFFFF" stroke="${STROKE}" stroke-width="2.6"/>
+              <ellipse cx="109" cy="107" rx="9.5" ry="10.8" fill="url(#${eyeGradId})"/>
+              <ellipse cx="109" cy="107.5" rx="5.2" ry="6" fill="#1E1B4B"/>
+              <path d="M102,112 Q109,117 116,112" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" opacity="0.55"/>
+              <ellipse cx="104.5" cy="101.5" rx="3.8" ry="4.4" fill="#FFFFFF"/>
+              <circle cx="113" cy="111" r="2" fill="#FFFFFF"/>
+              <path d="M95,102 Q108,90 121,102" fill="none" stroke="${STROKE}" stroke-width="3.6" stroke-linecap="round"/>
+
+              <!-- Right Eye -->
+              <ellipse cx="152" cy="106" rx="12.5" ry="13.5" fill="#FFFFFF" stroke="${STROKE}" stroke-width="2.6"/>
+              <ellipse cx="151" cy="107" rx="9.5" ry="10.8" fill="url(#${eyeGradId})"/>
+              <ellipse cx="151" cy="107.5" rx="5.2" ry="6" fill="#1E1B4B"/>
+              <path d="M144,112 Q151,117 158,112" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" opacity="0.55"/>
+              <ellipse cx="146.5" cy="101.5" rx="3.8" ry="4.4" fill="#FFFFFF"/>
+              <circle cx="155" cy="111" r="2" fill="#FFFFFF"/>
+              <path d="M139,102 Q152,90 165,102" fill="none" stroke="${STROKE}" stroke-width="3.6" stroke-linecap="round"/>
+              ${eyeSparkles}
+            </g>
+
+            <!-- Tiny Button Nose & Expressive Mouth -->
+            <path d="M128,116 Q130,119 132,116" fill="none" stroke="${STROKE}" stroke-width="2.4" stroke-linecap="round"/>
+            ${mouthSVG}
+
+            <!-- 5. LUSH FOREHEAD-COVERING FRONT HAIR, SIDE-LOCKS & ACCESSORIES (Drawn ON TOP of forehead!) -->
+            ${hairFront}
+
+            <!-- Soft Eyebrows peeking through bangs -->
+            <path d="M98,90 Q108,85 117,90 M143,90 Q152,85 162,90" fill="none" stroke="${profile.hairDark}" stroke-width="2.6" stroke-linecap="round"/>
+          </g>
+
+          <!-- Reaction Emojis / Sparkles -->
+          ${reactionExtras}
+        </svg>
+      `;
+    }
+
+    function renderSlide1HostGirlSVG() {
+      const lvl = LEVELS[0];
+      return `
+        <div class="relative w-full h-full flex flex-col items-center justify-end">
+          ${buildKawaiiCharacterSVG('girl_1', vocabPreviewOutfit, characterReaction, true)}
+          <div class="mt-1 bg-white/95 border-2 border-gray-900 rounded-full px-3 py-0.5 text-xs font-extrabold text-gray-900 shadow-sm flex items-center gap-1.5">
+            <span>${lvl.genderLabel}: ${lvl.characterName}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderDressUpCharacterSVG(characterType, worn, reaction) {
+      const lvl = LEVELS[currentSlideIndex];
+      return `
+        <div class="relative w-full h-full flex flex-col items-center justify-end">
+          ${buildKawaiiCharacterSVG(characterType, worn, reaction, false)}
+          <div class="mt-0.5 bg-white/95 border-2 border-gray-900 rounded-full px-3 py-0.5 text-xs font-extrabold text-gray-900 shadow-sm flex items-center gap-1.5">
+            <span>${lvl.genderLabel}: ${lvl.characterName}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    /*************************************************************************
+     * 7. SCREEN 1 (VOCABULARY PRACTICE) & SCREENS 2-6 (DRESS-UP) RENDERERS
+     *************************************************************************/
+    function renderScreenContent(lvl) {
+      const container = document.getElementById('screenContent');
+
+      if (lvl.type === 'vocab') {
+        renderVocabScreen(container, lvl);
+      } else {
+        renderDressUpScreen(container, lvl);
+      }
+    }
+
+    // SCREEN 1: "Let's practice the clothing"
+    function renderVocabScreen(container, lvl) {
+      const row1 = lvl.vocabItems.slice(0, 4);
+      const row2 = lvl.vocabItems.slice(4, 8);
+      const row3 = lvl.vocabItems.slice(8, 11);
+
+      const renderVocabCard = (itemId, idx) => {
+        const item = CLOTHING_DB[itemId];
+        const isReviewPulsing = vocabQuizState === 'reviewing' && lvl.vocabItems[vocabReviewIndex] === itemId;
+        const isFoundInQuiz = vocabQuizState === 'quizzing' && vocabQuizFound.has(itemId);
+
+        return `
+          <div
+            onclick="handleVocabClick('${itemId}')"
+            id="vocabCard_${itemId}"
+            class="relative group cursor-pointer flex flex-col items-center justify-between p-1.5 sm:p-2 rounded-2xl border-2 transition-all transform ${
+              isReviewPulsing
+                ? 'vocab-review-active border-amber-500'
+                : isFoundInQuiz
+                  ? 'bg-emerald-50 border-emerald-500 opacity-85 scale-[0.98]'
+                  : 'border-transparent hover:bg-sky-50 hover:-translate-y-1 active:scale-95'
+            }"
+          >
+            ${isFoundInQuiz ? `
+              <div class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-emerald-500 border-2 border-gray-900 text-white flex items-center justify-center shadow-sm z-10">
+                <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </div>
+            ` : ''}
+            <div class="w-20 h-16 sm:w-28 sm:h-22 md:w-32 md:h-24 flex items-center justify-center">
+              ${renderCardItemSVG(itemId)}
+            </div>
+            <div class="mt-1 w-full max-w-[140px] border-2 border-gray-900 rounded-lg ${
+              isReviewPulsing ? 'bg-amber-300' : isFoundInQuiz ? 'bg-emerald-200' : 'bg-white group-hover:bg-amber-100'
+            } px-1.5 py-0.5 sm:px-2 sm:py-1 text-center shadow-sm transition-colors">
+              <span class="font-bold text-[11px] sm:text-sm text-gray-900 leading-tight block truncate">
+                ${(hideVocabLabels || vocabQuizState === 'quizzing' || vocabQuizState === 'quiz_intro') && !isFoundInQuiz ? '?' : item.name}
+              </span>
+            </div>
+          </div>
+        `;
+      };
+
+      // Dynamic Banner Content based on vocabQuizState
+      let bannerTextHTML = activeVocabBannerHTML || `Click any piece of clothing to hear its name and an example sentence!`;
+      if (vocabQuizState === 'reviewing') {
+        const currentItem = CLOTHING_DB[lvl.vocabItems[vocabReviewIndex]];
+        if (currentItem) {
+          bannerTextHTML = `
+            <div class="flex flex-wrap items-center gap-2 text-amber-950">
+              <span class="px-2.5 py-0.5 rounded-full bg-amber-300 border-2 border-gray-900 text-xs font-black shrink-0">
+                Review ${vocabReviewIndex + 1} / ${lvl.vocabItems.length}
+              </span>
+              <span class="text-sm sm:text-base font-extrabold">
+                <strong class="uppercase underline text-sky-800">${currentItem.name}</strong>
+              </span>
+              ${vocabReviewSubphase === 'repeat' ? `
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-200 border-2 border-gray-900 text-emerald-950 text-xs sm:text-sm font-black animate-pulse">
+                  Your turn! Say: "${currentItem.name}"
+                </span>
+              ` : `
+                <span class="px-2 py-0.5 rounded-full bg-sky-100 border border-sky-800 text-sky-900 text-xs font-bold">
+                  Listen...
+                </span>
+              `}
+            </div>
+          `;
+        }
+      } else if (vocabQuizState === 'quiz_intro') {
+        bannerTextHTML = `
+          <span class="inline-flex items-center gap-2 text-indigo-950 font-extrabold text-sm sm:text-lg">
+            <span class="px-3 py-0.5 rounded-full bg-amber-300 border-2 border-gray-900 text-xs sm:text-sm font-black">
+              Quiz Time!
+            </span>
+            <span>Listen carefully and find each piece of clothing!</span>
+          </span>
+        `;
+      } else if (vocabQuizState === 'quizzing' && vocabQuizTarget) {
+        const targetItem = CLOTHING_DB[vocabQuizTarget];
+        if (vocabQuizPraiseText) {
+          bannerTextHTML = `
+            <span class="inline-flex flex-wrap items-center gap-2 text-emerald-800 font-extrabold text-sm sm:text-lg">
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-200 border-2 border-gray-900 text-xs font-black">
+                Found ${vocabQuizFound.size} / ${lvl.vocabItems.length}
+              </span>
+              <span>${vocabQuizPraiseText}</span>
+            </span>
+          `;
+        } else {
+          bannerTextHTML = `
+            <span class="inline-flex flex-wrap items-center gap-2 text-indigo-950 text-sm sm:text-lg">
+              <span class="px-2.5 py-0.5 rounded-full bg-indigo-200 border-2 border-gray-900 text-xs font-black">
+                Item ${vocabQuizFound.size + 1} of ${lvl.vocabItems.length}
+              </span>
+              <span>Find the <strong class="underline text-indigo-700 font-black uppercase px-1.5 py-0.5 bg-amber-200 rounded border border-gray-900">${targetItem.name}</strong>!</span>
+            </span>
+          `;
+        }
+      } else if (vocabQuizState === 'completed') {
+        bannerTextHTML = `
+          <span class="text-emerald-800 font-extrabold text-sm sm:text-lg">
+            Amazing job! You found all ${lvl.vocabItems.length} clothes! Moving to Sunny Weather...
+          </span>
+        `;
+      }
+
+      container.innerHTML = `
+        <!-- Top Row: Title + Mini-Quiz / Label Controls -->
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5 sm:mb-2">
+          <div class="flex items-center gap-2">
+            <h2 class="font-kid text-xl sm:text-3xl md:text-4xl font-bold text-gray-900 tracking-tight drop-shadow-sm">
+              Let’s practice the clothing
+            </h2>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <button onclick="toggleVocabLabels()" class="cartoon-pill bg-white hover:bg-gray-100 text-gray-900 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1">
+              <span>${hideVocabLabels ? 'Show Words' : 'Hide Words'}</span>
+            </button>
+            ${vocabQuizState === 'idle' ? `
+              <button onclick="startVocabQuizPrompt()" class="cartoon-pill bg-amber-400 hover:bg-amber-300 text-gray-900 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-1.5">
+                <span>"Find It!" Quiz</span>
+              </button>
+            ` : `
+              <button onclick="stopVocabQuizAndRender()" class="cartoon-pill bg-rose-500 hover:bg-rose-400 text-white px-3 py-1 sm:py-1.5 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-1">
+                <span>Stop Quiz</span>
+              </button>
+            `}
+          </div>
+        </div>
+
+        <!-- Speech / Quiz Prompt Banner -->
+        <div id="vocabPromptBanner" class="mb-2 bg-white/95 border-3 border-gray-900 rounded-2xl px-3 sm:px-4 py-1.5 sm:py-2 shadow flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2 text-xs sm:text-base font-bold text-gray-800">
+            <span id="vocabBannerText">${bannerTextHTML}</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            ${vocabQuizState === 'reviewing' ? `
+              <button onclick="advanceVocabReviewStepManually()" class="cartoon-pill bg-sky-200 hover:bg-sky-300 px-2.5 py-1 rounded-lg text-xs font-extrabold text-gray-900">
+                Next Word
+              </button>
+              <button onclick="beginVocabQuizPhase()" class="cartoon-pill bg-amber-300 hover:bg-amber-200 px-2.5 py-1 rounded-lg text-xs font-extrabold text-gray-900">
+                Skip Review
+              </button>
+            ` : ''}
+            ${vocabQuizState === 'quizzing' && vocabQuizTarget ? `
+              <button onclick="speakText('Find the ' + CLOTHING_DB[vocabQuizTarget].name)" class="cartoon-pill bg-sky-200 hover:bg-sky-300 px-2.5 py-1 rounded-lg text-xs font-extrabold text-gray-900">
+                Repeat Word
+              </button>
+            ` : ''}
+          </div>
+        </div>
+
+        <!-- Main Split Layout: Girl on Left, White Framed Board on Right -->
+        <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-end">
+          <!-- Left: Cheerful Girl Character (Matches Slide 1) -->
+          <div class="hidden lg:flex lg:col-span-3 h-full items-end justify-center">
+            <div onclick="speakText('Let\\'s practice the clothing together!')" class="cursor-pointer w-full h-full flex items-end justify-center hover:scale-[1.02] transition-transform" title="Click me!">
+              ${renderSlide1HostGirlSVG()}
+            </div>
+          </div>
+
+          <!-- Right: White Framed Vocabulary Board with 3 Rows -->
+          <div class="lg:col-span-9 bg-white cartoon-box rounded-xl p-2 sm:p-4 flex flex-col justify-between gap-1.5 sm:gap-2">
+            <!-- Row 1 (4 items) -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
+              ${row1.map((id, i) => renderVocabCard(id, i)).join('')}
+            </div>
+            <!-- Row 2 (4 items) -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
+              ${row2.map((id, i) => renderVocabCard(id, i + 4)).join('')}
+            </div>
+            <!-- Row 3 (3 footwear items centered) -->
+            <div class="grid grid-cols-3 gap-1.5 sm:gap-2 max-w-2xl mx-auto w-full">
+              ${row3.map((id, i) => renderVocabCard(id, i + 8)).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateMiaVocabPreview(itemId) {
+      const item = CLOTHING_DB[itemId];
+      if (!item) return;
+      vocabPreviewOutfit = {
+        top: null, outerwear: null, bottom: null, dress: null,
+        socks: null, shoes: 'sandals_blue', accessory: null, headwear: null
+      };
+      if (item.slot === 'dress') {
+        vocabPreviewOutfit.dress = itemId;
+      } else if (item.slot === 'top' || item.slot === 'outerwear') {
+        vocabPreviewOutfit[item.slot] = itemId;
+        vocabPreviewOutfit.bottom = 'skirt_floral';
+      } else if (item.slot === 'bottom') {
+        vocabPreviewOutfit.top = 'tshirt_bear';
+        vocabPreviewOutfit.bottom = itemId;
+      } else {
+        vocabPreviewOutfit.dress = 'dress_ruffle_yellow';
+        vocabPreviewOutfit[item.slot] = itemId;
+      }
+    }
+
+    function handleVocabClick(itemId) {
+      const item = CLOTHING_DB[itemId];
+      if (!item) return;
+
+      // Ignore manual card clicks while automatic review or quiz intro is running
+      if (vocabQuizState === 'reviewing' || vocabQuizState === 'quiz_intro' || vocabQuizState === 'completed') return;
+
+      updateMiaVocabPreview(itemId);
+      characterReaction = 'happy';
+
+      // Check if we are in the active "Find It!" Quiz phase
+      if (vocabQuizState === 'quizzing' && vocabQuizTarget) {
+        // Ignore clicks during the brief praise transition between items
+        if (vocabQuizPraiseText) return;
+
+        if (itemId === vocabQuizTarget) {
+          playSound('success');
+          vocabQuizFound.add(itemId);
+
+          // Did the player find all 11 items?
+          if (vocabQuizQueue.length === 0) {
+            vocabQuizState = 'completed';
+            vocabQuizTarget = null;
+            completedLevels.add(1);
+            updateStarCounter();
+            renderNavigation();
+            renderScreenContent(LEVELS[0]);
+            playSound('fanfare');
+            launchConfetti();
+            speakText("Amazing job! You found all the clothing! Let's play the weather dress-up game!", () => {
+              if (currentSlideIndex === 0 && vocabQuizState === 'completed') {
+                vocabFlowTimer = setTimeout(() => {
+                  switchSlide(1);
+                }, 1000);
+              }
+            });
+            return;
+          }
+
+          // Step 1: Praise the student for finding the item
+          vocabQuizPraiseText = `Great job! That is the ${item.name}!`;
+          renderScreenContent(LEVELS[0]);
+
+          speakText(`Great job!`, () => {
+            if (currentSlideIndex !== 0 || vocabQuizState !== 'quizzing') return;
+            // Step 2: Pause briefly so A1 beginners can process, then show & speak "Find the (next clothing)"
+            vocabFlowTimer = setTimeout(() => {
+              if (currentSlideIndex !== 0 || vocabQuizState !== 'quizzing') return;
+              vocabQuizPraiseText = null;
+              vocabQuizTarget = vocabQuizQueue.shift();
+              characterReaction = 'normal';
+              renderScreenContent(LEVELS[0]);
+              const nextName = CLOTHING_DB[vocabQuizTarget].name;
+              speakText(`Find the ${nextName}`);
+            }, 650);
+          });
+        } else {
+          playSound('oops');
+          const cardEl = document.getElementById(`vocabCard_${itemId}`);
+          if (cardEl) {
+            cardEl.classList.add('ring-4', 'ring-rose-400', 'bg-rose-50');
+            setTimeout(() => cardEl.classList.remove('ring-4', 'ring-rose-400', 'bg-rose-50'), 650);
+          }
+          const targetName = CLOTHING_DB[vocabQuizTarget].name;
+          const bannerEl = document.getElementById('vocabBannerText');
+          if (bannerEl) {
+            bannerEl.innerHTML = `
+              <span class="inline-flex flex-wrap items-center gap-2 text-rose-700 font-extrabold text-sm sm:text-lg">
+                <span>That is the <strong>${item.name}</strong>.</span>
+                <span class="text-indigo-950">Find the <strong class="underline text-indigo-700 font-black uppercase px-1.5 py-0.5 bg-amber-200 rounded border border-gray-900">${targetName}</strong>!</span>
+              </span>
+            `;
+          }
+          speakText(`That is the ${item.name}.`, () => {
+            if (currentSlideIndex !== 0 || vocabQuizState !== 'quizzing' || !vocabQuizTarget) return;
+            vocabFlowTimer = setTimeout(() => {
+              if (currentSlideIndex !== 0 || vocabQuizState !== 'quizzing' || !vocabQuizTarget) return;
+              renderScreenContent(LEVELS[0]);
+              speakText(`Find the ${CLOTHING_DB[vocabQuizTarget].name}`);
+            }, 550);
+          });
+        }
+        return;
+      }
+
+      // Standard Explore Mode: Keep the spoken sentence visible in the banner the entire time audio plays!
+      activeVocabBannerHTML = `
+        <span class="inline-flex flex-wrap items-center gap-2">
+          <strong class="text-sky-700 uppercase font-black">${item.name}:</strong>
+          <span class="text-gray-900 font-extrabold">"${item.sentence}"</span>
+        </span>
+      `;
+      renderScreenContent(LEVELS[currentSlideIndex]);
+
+      const cardEl = document.getElementById(`vocabCard_${itemId}`);
+      if (cardEl) {
+        cardEl.classList.add('ring-4', 'ring-amber-400', 'bg-amber-50');
+      }
+
+      playSound('pop');
+      if (bounceTimeout) clearTimeout(bounceTimeout);
+
+      speakText(item.sentence, () => {
+        // Keep sentence visible after audio finishes, only relax character pose & card ring
+        characterReaction = 'normal';
+        const activeCard = document.getElementById(`vocabCard_${itemId}`);
+        if (activeCard) {
+          activeCard.classList.remove('ring-4', 'ring-amber-400', 'bg-amber-50');
+        }
+      });
+    }
+
+    function toggleVocabLabels() {
+      hideVocabLabels = !hideVocabLabels;
+      renderScreenContent(LEVELS[currentSlideIndex]);
+    }
+
+    function stopVocabQuizAndRender() {
+      stopVocabQuizFlow();
+      renderScreenContent(LEVELS[0]);
+    }
+
+    // Starts Phase 1: Guided Review of all 11 clothing items out loud with pulsing highlight & student practice pause
+    function startVocabQuizPrompt() {
+      stopVocabQuizFlow();
+      const sessionId = ++vocabFlowSessionId;
+      vocabQuizState = 'reviewing';
+      vocabReviewIndex = 0;
+      vocabReviewSubphase = 'listen';
+      playSound('pop');
+      runNextVocabReviewStep(sessionId);
+    }
+
+    function advanceVocabReviewStepManually() {
+      if (currentSlideIndex !== 0 || vocabQuizState !== 'reviewing') return;
+      if (vocabFlowTimer) {
+        clearTimeout(vocabFlowTimer);
+        vocabFlowTimer = null;
+      }
+      activeSpeechToken++;
+      const sessionId = ++vocabFlowSessionId;
+      vocabReviewIndex++;
+      runNextVocabReviewStep(sessionId);
+    }
+
+    function runNextVocabReviewStep(sessionId = vocabFlowSessionId) {
+      if (currentSlideIndex !== 0 || vocabQuizState !== 'reviewing' || sessionId !== vocabFlowSessionId) return;
+      const lvl = LEVELS[0];
+
+      if (vocabReviewIndex >= lvl.vocabItems.length) {
+        beginVocabQuizPhase();
+        return;
+      }
+
+      const itemId = lvl.vocabItems[vocabReviewIndex];
+      const item = CLOTHING_DB[itemId];
+      vocabReviewSubphase = 'listen';
+      updateMiaVocabPreview(itemId);
+      characterReaction = 'happy';
+      renderScreenContent(lvl);
+
+      // Ensure pulsed card is visible on small mobile screens
+      const cardEl = document.getElementById(`vocabCard_${itemId}`);
+      if (cardEl && window.innerWidth < 640) {
+        cardEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      playSound('pop');
+      speakText(item.name, () => {
+        if (currentSlideIndex !== 0 || vocabQuizState !== 'reviewing' || sessionId !== vocabFlowSessionId) return;
+        // Switch banner to "Your turn! Say: [item.name]" and pause 2.1 seconds so A1 beginners can repeat out loud
+        vocabReviewSubphase = 'repeat';
+        characterReaction = 'normal';
+        renderScreenContent(lvl);
+
+        vocabFlowTimer = setTimeout(() => {
+          if (currentSlideIndex !== 0 || vocabQuizState !== 'reviewing' || sessionId !== vocabFlowSessionId) return;
+          vocabReviewIndex++;
+          runNextVocabReviewStep(sessionId);
+        }, 2100);
+      });
+    }
+
+    // Starts Phase 2: Announces "Quiz time!", pauses, and then prompts "Find the + (clothing)" for each item
+    function beginVocabQuizPhase() {
+      // Increment session ID and clear any active review timers/speech so old review callbacks cannot interfere
+      const sessionId = ++vocabFlowSessionId;
+      if (vocabFlowTimer) {
+        clearTimeout(vocabFlowTimer);
+        vocabFlowTimer = null;
+      }
+      if (speechQueueTimer) {
+        clearTimeout(speechQueueTimer);
+        speechQueueTimer = null;
+      }
+      activeSpeechToken++;
+
+      const lvl = LEVELS[0];
+      vocabReviewIndex = -1;
+      vocabReviewSubphase = 'listen';
+      vocabQuizFound.clear();
+      vocabQuizPraiseText = null;
+
+      // Fisher-Yates shuffle of all 11 vocabulary items
+      const shuffled = [...lvl.vocabItems];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+
+      vocabQuizTarget = shuffled.shift();
+      vocabQuizQueue = shuffled;
+      vocabQuizState = 'quiz_intro';
+      characterReaction = 'normal';
+      playSound('fanfare');
+      renderScreenContent(lvl);
+
+      let quizStarted = false;
+      const startFirstQuestion = () => {
+        if (quizStarted || currentSlideIndex !== 0 || sessionId !== vocabFlowSessionId) return;
+        quizStarted = true;
+        vocabQuizState = 'quizzing';
+        renderScreenContent(lvl);
+        const targetName = CLOTHING_DB[vocabQuizTarget].name;
+        speakText(`Find the ${targetName}`);
+      };
+
+      // Safety fallback so skipping review ALWAYS enters the quiz even if browser TTS hiccups
+      vocabFlowTimer = setTimeout(startFirstQuestion, 2300);
+
+      // First say "Quiz time!", then pause 800ms so students clearly hear "Find the [clothing]!"
+      speakText("Quiz time!", () => {
+        if (currentSlideIndex !== 0 || sessionId !== vocabFlowSessionId) return;
+        if (vocabFlowTimer) clearTimeout(vocabFlowTimer);
+        vocabFlowTimer = setTimeout(startFirstQuestion, 800);
+      });
+    }
+
+    /*************************************************************************
+     * 8. SCREENS 2–6: INTERACTIVE WEATHER DRESS-UP RENDERER & MECHANICS
+     *************************************************************************/
+    function renderDressUpScreen(container, lvl) {
+      const status = lvl.checkComplete(wornOutfit);
+      const isManyItems = lvl.wardrobe.length > 8; // e.g., Level 4 Snowy has 9 items
+
+      // Build list of currently worn items so player can also see/remove them with one click
+      const wornList = Object.entries(wornOutfit)
+        .filter(([_, id]) => Boolean(id))
+        .map(([slot, id]) => ({ slot, ...CLOTHING_DB[id] }));
+
+      // Only show the hint or feedback if the player has failed or completed the outfit
+      let feedbackBannerHTML = '';
+      if (feedbackMessage && (feedbackMessage.type === 'error' || feedbackMessage.type === 'win')) {
+        feedbackBannerHTML = `
+          <div class="mb-1 px-3 py-1 rounded-2xl border-2 border-gray-900 text-xs sm:text-sm font-extrabold shadow-md max-w-xs text-center z-30 ${
+            feedbackMessage.type === 'error'
+              ? 'bg-rose-100 text-rose-900 animate-bounce'
+              : 'bg-emerald-200 text-emerald-950'
+          }">
+            ${feedbackMessage.text}
+          </div>
+        `;
+      } else if (hasFailedCurrentLevel && !status.isComplete) {
+        feedbackBannerHTML = `
+          <div class="mb-1 px-3 py-1 rounded-full bg-amber-100/95 border-2 border-gray-900 text-xs font-extrabold text-gray-900 shadow-sm z-30">
+            Hint: ${status.missingHint}
+          </div>
+        `;
+      }
+
+      // Adaptive grid columns & card sizes so 9-item levels (Snowy) fit in 2 rows on desktop and 3 compact rows on mobile
+      const gridColsClass = isManyItems
+        ? 'grid-cols-3 sm:grid-cols-3 md:grid-cols-5 gap-1.5 sm:gap-2'
+        : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-2.5';
+
+      const cardIconSizeClass = isManyItems
+        ? 'w-16 h-16 sm:w-20 sm:h-20 md:w-22 md:h-22'
+        : 'w-20 h-20 sm:w-24 sm:h-24';
+
+      container.innerHTML = `
+        <!-- Main Split Area: Child + Speech Bubble on Left, Instruction + Wardrobe on Right -->
+        <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-2.5 sm:gap-4 items-end my-auto">
+          
+          <!-- Left Column: Interactive Child Character with Speech Bubble Anchored Directly Next to Head -->
+          <div class="lg:col-span-5 flex flex-col items-center justify-end h-full relative">
+
+            <!-- Dynamic Pedagogical Feedback / Hint (Only appears after failing or winning) -->
+            ${feedbackBannerHTML}
+
+            <!-- Character SVG Container (Drop Target) with Speech Bubble Attached Right Next to Mouth/Head -->
+            <div
+              id="characterDropZone"
+              ondragover="handleDragOver(event)"
+              ondragleave="handleDragLeave(event)"
+              ondrop="handleDropOnChild(event)"
+              class="relative w-44 sm:w-56 md:w-60 h-64 sm:h-80 md:h-88 flex items-end justify-center transition-all p-1"
+            >
+              ${thoughtBubbleVisible ? `
+                <div
+                  onclick="playWeatherIntroSequence(LEVELS[currentSlideIndex])"
+                  title="Click to hear again!"
+                  class="thought-bubble-enter cursor-pointer group absolute top-[6%] left-[64%] sm:left-[68%] z-30 bg-white border-4 border-gray-900 rounded-3xl px-3 sm:px-4 py-1.5 sm:py-2 shadow-[4px_5px_0_#FDE047] hover:scale-105 transition-transform w-max max-w-[145px] sm:max-w-[195px]"
+                >
+                  <p class="font-kid text-sm sm:text-lg md:text-xl font-bold text-gray-900 text-center leading-tight">
+                    ${lvl.thoughtHtml}
+                  </p>
+                  <!-- Direct Speech Pointer Tail Pointing to the Character's Mouth/Cheek -->
+                  <svg viewBox="0 0 32 24" class="absolute top-1/2 -left-[20px] -translate-y-1/2 w-5 h-4 sm:w-6 sm:h-5 overflow-visible pointer-events-none">
+                    <path d="M24,2 L2,14 L24,20 Z" fill="#FFFFFF" stroke="#111827" stroke-width="4" stroke-linejoin="round"/>
+                    <path d="M22,4 L26,4 L26,18 L22,18 Z" fill="#FFFFFF"/>
+                  </svg>
+                </div>
+              ` : ''}
+
+              ${renderDressUpCharacterSVG(lvl.characterType, wornOutfit, characterReaction)}
+            </div>
+
+            <!-- Currently Worn Pills (Click to remove individual item) -->
+            <div class="min-h-[26px] flex flex-wrap items-center justify-center gap-1 mt-0.5">
+              ${wornList.length === 0
+                ? `<span class="text-[11px] sm:text-xs font-bold text-white bg-gray-900/65 px-2.5 py-0.5 rounded-full">Tap or drag clothes onto ${lvl.characterName}</span>`
+                : wornList.map(item => `
+                    <button onclick="removeWornSlot('${item.slot}')" class="bg-white/95 hover:bg-rose-100 text-gray-900 border-2 border-gray-900 rounded-full px-2 py-0.5 text-[11px] sm:text-xs font-bold flex items-center gap-1 shadow-sm" title="Tap to remove">
+                      <span>${item.name}</span>
+                      <span class="text-rose-600 font-black">x</span>
+                    </button>
+                  `).join('')
+              }
+            </div>
+          </div>
+
+          <!-- Right Column: Instruction Text + White Wardrobe Box + Non-Obscuring Big Reset Icon Button -->
+          <div class="lg:col-span-7 flex flex-col justify-end gap-2">
+            
+            <!-- Instruction Row above Wardrobe Box -->
+            <div class="flex items-center justify-between gap-2.5 bg-white/95 border-3 border-gray-900 rounded-2xl px-3.5 py-1.5 sm:py-2 shadow-sm">
+              <p class="font-extrabold text-gray-900 text-xs sm:text-base leading-snug">
+                ${lvl.instruction}
+              </p>
+
+              <!-- Big, Obvious Icon-Only Reset Button (Placed cleanly outside sky/character visuals) -->
+              <button
+                onclick="clearOutfit()"
+                aria-label="Reset Outfit"
+                title="Reset Outfit"
+                class="cartoon-pill shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-rose-500 hover:bg-rose-400 active:bg-rose-600 text-white flex items-center justify-center shadow-md hover:rotate-[-25deg] transition-transform"
+              >
+                <svg viewBox="0 0 24 24" class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 12a9 9 0 1 0 3-6.7L3 8"/>
+                  <path d="M3 3v5h5"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- White Wardrobe Box (Compact & Responsive so Next Level Button is ALWAYS inside the viewable screen) -->
+            <div class="bg-white cartoon-box rounded-xl p-2.5 sm:p-4 flex flex-col justify-between">
+              <div class="grid ${gridColsClass} my-auto">
+                ${lvl.wardrobe.map(itemId => {
+                  const item = CLOTHING_DB[itemId];
+                  const isCurrentlyWorn = Object.values(wornOutfit).includes(itemId);
+                  return `
+                    <div
+                      draggable="true"
+                      ondragstart="handleDragStart(event, '${itemId}')"
+                      onpointerdown="handleTouchDragStart(event, '${itemId}')"
+                      onclick="equipOrToggleItem('${itemId}')"
+                      class="group cursor-pointer rounded-2xl border-2 p-1.5 sm:p-2 flex flex-col items-center justify-between transition-all select-none touch-manipulation ${
+                        isCurrentlyWorn
+                          ? 'border-emerald-600 bg-emerald-50 ring-2 ring-emerald-400 scale-[0.98]'
+                          : 'border-gray-200 hover:border-gray-900 hover:bg-sky-50 hover:-translate-y-0.5 active:scale-95'
+                      }"
+                    >
+                      <div class="${cardIconSizeClass} flex items-center justify-center">
+                        ${renderCardItemSVG(itemId)}
+                      </div>
+                      <div class="mt-0.5 flex items-center gap-1 w-full justify-center">
+                        <span class="text-[11px] sm:text-xs md:text-sm font-bold text-gray-800 group-hover:text-gray-900 text-center leading-tight truncate">
+                          ${item.name}
+                        </span>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+
+              <!-- Next Level Celebration Bar when Outfit is Complete (Always visible inside the box) -->
+              ${status.isComplete ? `
+                <div id="nextLevelBar" class="mt-2.5 bg-emerald-100 border-3 border-emerald-800 rounded-xl p-2 sm:p-2.5 flex flex-wrap items-center justify-between gap-2 shadow-sm">
+                  <div class="flex items-center gap-2">
+                    <p class="font-kid font-bold text-emerald-950 text-xs sm:text-base">
+                      Awesome Job! Perfect outfit for ${lvl.weatherKey} weather!
+                    </p>
+                  </div>
+                  ${currentSlideIndex < LEVELS.length - 1 ? `
+                    <button onclick="switchSlide(${currentSlideIndex + 1})" class="cartoon-pill bg-amber-400 hover:bg-amber-300 text-gray-900 px-3.5 sm:px-4 py-1.5 rounded-xl font-extrabold text-xs sm:text-sm shrink-0">
+                      Next Weather Level
+                    </button>
+                  ` : `
+                    <button onclick="switchSlide(0)" class="cartoon-pill bg-amber-400 hover:bg-amber-300 text-gray-900 px-3.5 sm:px-4 py-1.5 rounded-xl font-extrabold text-xs sm:text-sm shrink-0">
+                      All Done! Back to Start
+                    </button>
+                  `}
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+
+      // If level just completed on a small mobile screen, smoothly ensure the Next Level bar is in view
+      if (status.isComplete) {
+        const nextBar = document.getElementById('nextLevelBar');
+        if (nextBar && window.innerWidth < 768) {
+          setTimeout(() => nextBar.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+        }
+      }
+    }
+
+    /*************************************************************************
+     * 9. EQUIP / DRAG-AND-DROP (MOUSE & MOBILE TOUCH) / WEATHER VALIDATION
+     *************************************************************************/
+    let draggedItemId = null;
+    let touchDragItem = null;
+    let touchStartPos = null;
+    let isTouchDragging = false;
+
+    function handleDragStart(e, itemId) {
+      draggedItemId = itemId;
+      e.dataTransfer.setData('text/plain', itemId);
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      const dz = document.getElementById('characterDropZone');
+      if (dz) dz.classList.add('drop-zone-active');
+    }
+
+    function handleDragLeave(e) {
+      const dz = document.getElementById('characterDropZone');
+      if (dz) dz.classList.remove('drop-zone-active');
+    }
+
+    function handleDropOnChild(e) {
+      e.preventDefault();
+      const dz = document.getElementById('characterDropZone');
+      if (dz) dz.classList.remove('drop-zone-active');
+      const itemId = e.dataTransfer.getData('text/plain') || draggedItemId;
+      if (itemId) {
+        equipOrToggleItem(itemId, true);
+      }
+    }
+
+    // Smooth Touch Dragging for Smartphones & Tablets
+    function handleTouchDragStart(e, itemId) {
+      if (e.pointerType !== 'touch') return;
+      touchDragItem = itemId;
+      touchStartPos = { x: e.clientX, y: e.clientY };
+      isTouchDragging = false;
+    }
+
+    window.addEventListener('pointermove', (e) => {
+      if (!touchDragItem || e.pointerType !== 'touch') return;
+      const dx = e.clientX - touchStartPos.x;
+      const dy = e.clientY - touchStartPos.y;
+      if (!isTouchDragging && Math.hypot(dx, dy) > 12) {
+        isTouchDragging = true;
+        const ghost = document.getElementById('touchDragGhost');
+        if (ghost) {
+          ghost.innerHTML = renderCardItemSVG(touchDragItem);
+          ghost.style.display = 'block';
+        }
+      }
+      if (isTouchDragging) {
+        const ghost = document.getElementById('touchDragGhost');
+        if (ghost) {
+          ghost.style.left = `${e.clientX}px`;
+          ghost.style.top = `${e.clientY}px`;
+        }
+        const dz = document.getElementById('characterDropZone');
+        if (dz) {
+          const rect = dz.getBoundingClientRect();
+          const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
+          dz.classList.toggle('drop-zone-active', inside);
+        }
+      }
+    }, { passive: true });
+
+    window.addEventListener('pointerup', (e) => {
+      if (!touchDragItem || e.pointerType !== 'touch') return;
+      const ghost = document.getElementById('touchDragGhost');
+      if (ghost) ghost.style.display = 'none';
+
+      const dz = document.getElementById('characterDropZone');
+      if (dz) dz.classList.remove('drop-zone-active');
+
+      if (isTouchDragging && dz) {
+        const rect = dz.getBoundingClientRect();
+        const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
+        if (inside) {
+          equipOrToggleItem(touchDragItem, true);
+        }
+      }
+      touchDragItem = null;
+      isTouchDragging = false;
+    });
+
+    function equipOrToggleItem(itemId, forceEquip = false) {
+      if (bounceTimeout) clearTimeout(bounceTimeout);
+
+      const lvl = LEVELS[currentSlideIndex];
+      const item = CLOTHING_DB[itemId];
+      if (!item) return;
+
+      // Ensure thought bubble stays visible if user interacts quickly
+      thoughtBubbleVisible = true;
+
+      // If already worn and clicked (not dropped), take it off
+      if (!forceEquip && wornOutfit[item.slot] === itemId) {
+        wornOutfit[item.slot] = null;
+        const anyWorn = Object.values(wornOutfit).some(Boolean);
+        characterReaction = anyWorn ? 'normal' : getDefaultWeatherReaction(lvl.weatherKey);
+        feedbackMessage = null;
+        playSound('pop');
+        renderScreenContent(lvl);
+        return;
+      }
+
+      // Check if this item is inappropriate for the current weather
+      const wrongReason = lvl.wrongReasons && lvl.wrongReasons[itemId];
+      if (wrongReason) {
+        // Mark that the player has failed at least once on this level so hints become visible!
+        hasFailedCurrentLevel = true;
+        // Put it on briefly so the child reacts (shivers/sweats) and explains why!
+        wornOutfit[item.slot] = itemId;
+        characterReaction = (lvl.weatherKey === 'sunny') ? 'sweat' : 'shiver';
+        feedbackMessage = { type: 'error', text: wrongReason };
+        playSound('oops');
+        speakText(wrongReason);
+        renderScreenContent(lvl);
+
+        // Gently bounce the inappropriate item back to the wardrobe after 1.9 seconds
+        bounceTimeout = setTimeout(() => {
+          if (wornOutfit[item.slot] === itemId) {
+            wornOutfit[item.slot] = null;
+            const anyWorn = Object.values(wornOutfit).some(Boolean);
+            characterReaction = anyWorn ? 'normal' : getDefaultWeatherReaction(lvl.weatherKey);
+            feedbackMessage = null;
+            renderScreenContent(lvl);
+          }
+        }, 1950);
+        return;
+      }
+
+      // Handle Dress vs Top+Bottom exclusivity so outfits look clean
+      if (item.slot === 'dress') {
+        wornOutfit.top = null;
+        wornOutfit.bottom = null;
+      } else if (item.slot === 'top' || item.slot === 'bottom') {
+        wornOutfit.dress = null;
+      }
+
+      // Equip valid item!
+      wornOutfit[item.slot] = itemId;
+
+      // Check if the full outfit for this weather level is now complete
+      const status = lvl.checkComplete(wornOutfit);
+      if (status.isComplete) {
+        characterReaction = 'happy';
+        feedbackMessage = {
+          type: 'win',
+          text: `Great job! The ${item.name} completes the ${lvl.weatherKey} weather outfit!`
+        };
+        completedLevels.add(lvl.id);
+        updateStarCounter();
+        renderNavigation();
+        playSound('fanfare');
+        launchConfetti();
+        speakText(`Great job! ${item.name}! You dressed the child for ${lvl.weatherKey} weather!`);
+      } else {
+        characterReaction = 'normal';
+        feedbackMessage = null;
+        playSound('success');
+        speakText(item.name);
+      }
+
+      renderScreenContent(lvl);
+    }
+
+    function removeWornSlot(slot) {
+      const lvl = LEVELS[currentSlideIndex];
+      const removedId = wornOutfit[slot];
+      if (!removedId) return;
+      wornOutfit[slot] = null;
+      const anyWorn = Object.values(wornOutfit).some(Boolean);
+      characterReaction = anyWorn ? 'normal' : getDefaultWeatherReaction(lvl.weatherKey);
+      feedbackMessage = null;
+      playSound('pop');
+      renderScreenContent(lvl);
+    }
+
+    function clearOutfit() {
+      const lvl = LEVELS[currentSlideIndex];
+      wornOutfit = {
+        top: null, outerwear: null, bottom: null, dress: null,
+        socks: null, shoes: null, accessory: null, headwear: null
+      };
+      feedbackMessage = null;
+      playSound('pop');
+      playWeatherIntroSequence(lvl);
+    }
+
+    function resetAllProgress() {
+      completedLevels.clear();
+      switchSlide(0);
+    }
+
+    /*************************************************************************
+     * 10. CELEBRATION CONFETTI ENGINE
+     *************************************************************************/
+    let confettiParticles = [];
+    let confettiAnimId = null;
+
+    function launchConfetti() {
+      const canvas = document.getElementById('confettiCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+
+      const colors = ['#FACC15', '#EF4444', '#3B82F6', '#10B981', '#EC4899', '#A855F7'];
+      confettiParticles = Array.from({ length: 75 }).map(() => ({
+        x: canvas.width / 2 + (Math.random() - 0.5) * 180,
+        y: canvas.height * 0.45,
+        vx: (Math.random() - 0.5) * 12,
+        vy: -Math.random() * 12 - 4,
+        size: Math.random() * 8 + 5,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rotation: Math.random() * 360,
+        vRot: (Math.random() - 0.5) * 12
+      }));
+
+      if (confettiAnimId) cancelAnimationFrame(confettiAnimId);
+
+      function step() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let active = false;
+        confettiParticles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.35; // gravity
+          p.rotation += p.vRot;
+          if (p.y < canvas.height + 20) active = true;
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.7);
+          ctx.restore();
+        });
+
+        if (active) {
+          confettiAnimId = requestAnimationFrame(step);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+      step();
+    }
+
+    // Initialize on load
+    window.onload = function () {
+      switchSlide(0);
+    };
+  </script>
+</body>
+</html>

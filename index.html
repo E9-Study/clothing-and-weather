@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Let's Practice Our Clothing! - Weather Dress-Up Game by Eri.9</title>
+  <title>Let's Practice the Clothing! - ESL Weather Dress-Up Game</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Kid-friendly rounded fonts -->
@@ -19,9 +19,10 @@
 
     body {
       font-family: var(--font-body);
-      user-select: noneF;
+      user-select: none;
       -webkit-user-select: none;
       overflow-x: hidden;
+      touch-action: manipulation;
     }
 
     h1, h2, h3, .font-kid {
@@ -30,14 +31,26 @@
 
     /* Slide-authentic thick cartoon borders */
     .cartoon-box {
-      border: 4px solid #111827;
-      box-shadow: 0 8px 0 rgba(17, 24, 39, 0.18);
+      border: 3px solid #111827;
+      box-shadow: 0 5px 0 rgba(17, 24, 39, 0.18);
+    }
+    @media (min-width: 640px) {
+      .cartoon-box {
+        border: 4px solid #111827;
+        box-shadow: 0 8px 0 rgba(17, 24, 39, 0.18);
+      }
     }
 
     .cartoon-pill {
-      border: 2.5px solid #111827;
-      box-shadow: 0 3px 0 #111827;
+      border: 2px solid #111827;
+      box-shadow: 0 2px 0 #111827;
       transition: all 0.15s ease;
+    }
+    @media (min-width: 640px) {
+      .cartoon-pill {
+        border: 2.5px solid #111827;
+        box-shadow: 0 3px 0 #111827;
+      }
     }
 
     .cartoon-pill:active {
@@ -272,62 +285,65 @@
 </head>
 <body class="bg-slate-900 min-h-[100dvh] flex flex-col justify-between overflow-x-hidden">
 
-  <!-- Floating Ghost Element for Smooth Mobile/Tablet Touch Dragging -->
+  <!-- Floating Ghost Element for Desktop/Tablet Dragging -->
   <div id="touchDragGhost"></div>
 
-  <!-- TOP NAVIGATION BAR -->
-  <header class="bg-white border-b-4 border-gray-900 px-2.5 sm:px-4 py-1.5 sm:py-2 shadow-md z-30 shrink-0">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-1.5 sm:gap-2">
-      <!-- Game Title & Logo -->
-      <div class="flex items-center gap-2">
-        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-300 border-2 border-gray-900 flex items-center justify-center shadow-sm shrink-0">
-          <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5 text-gray-900" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>
-          </svg>
+  <!-- TOP NAVIGATION BAR (Stacked 3x2 buttons on Smartphones, Original Bar on Tablet/Desktop) -->
+  <header class="bg-white border-b-3 sm:border-b-4 border-gray-900 px-2.5 sm:px-4 py-1.5 sm:py-2 shadow-md z-30 shrink-0">
+    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center lg:justify-between gap-1.5 sm:gap-2">
+      
+      <!-- Top Row: Game Title + Voice Toggle + Star Counter -->
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2 min-w-0">
+          <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-300 border-2 border-gray-900 flex items-center justify-center shadow-sm shrink-0">
+            <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5 text-gray-900" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>
+            </svg>
+          </div>
+          <div class="truncate">
+            <h1 class="font-kid text-sm sm:text-xl font-bold text-gray-900 leading-tight truncate">Clothes &amp; Weather Game by Eri.9</h1>
+            <p class="text-[11px] text-gray-600 hidden xl:block">Learn vocabulary &amp; dress for the weather!</p>
+          </div>
         </div>
-        <div>
-          <h1 class="font-kid text-base sm:text-xl font-bold text-gray-900 leading-tight">Clothes &amp; Weather Game by Eri.9</h1>
-          <p class="text-[11px] text-gray-600 hidden xl:block">Learn vocabulary &amp; dress for the weather!</p>
+
+        <!-- Controls: Voice Toggle & Star Counter -->
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <button id="voiceToggleBtn" onclick="toggleVoice()" class="cartoon-pill bg-sky-100 hover:bg-sky-200 text-sky-900 px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold flex items-center gap-1" title="Toggle Spoken Voice">
+            <svg viewBox="0 0 24 24" class="w-4 h-4 text-sky-900" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path id="voiceWavesPath" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/>
+            </svg>
+            <span id="voiceLabel" class="hidden md:inline">Voice ON</span>
+          </button>
+
+          <div class="cartoon-pill bg-amber-300 text-gray-900 px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-extrabold flex items-center gap-1">
+            <svg viewBox="0 0 24 24" class="w-4 h-4 text-amber-700 fill-amber-500" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <span id="starCountText">0 / 6</span>
+          </div>
         </div>
       </div>
 
-      <!-- 6 Slide Tabs (Horizontally scrollable on narrow phones, wrapped on larger screens) -->
-      <nav id="slideNav" class="flex items-center gap-1 sm:gap-1.5 overflow-x-auto max-w-full py-0.5 no-scrollbar">
+      <!-- 6 Slide Tabs: Stacked 3x2 Grid on Smartphones, Flex Row on Tablet/Desktop -->
+      <nav id="slideNav" class="grid grid-cols-3 sm:flex sm:flex-wrap items-center justify-center gap-1 sm:gap-1.5 w-full lg:w-auto">
         <!-- Populated dynamically by JS -->
       </nav>
-
-      <!-- Controls: Voice Toggle & Star Counter -->
-      <div class="flex items-center gap-1.5 sm:gap-2">
-        <button id="voiceToggleBtn" onclick="toggleVoice()" class="cartoon-pill bg-sky-100 hover:bg-sky-200 text-sky-900 px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold flex items-center gap-1" title="Toggle Spoken Voice">
-          <svg viewBox="0 0 24 24" class="w-4 h-4 text-sky-900" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-            <path id="voiceWavesPath" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/>
-          </svg>
-          <span id="voiceLabel" class="hidden md:inline">Voice ON</span>
-        </button>
-
-        <div class="cartoon-pill bg-amber-300 text-gray-900 px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-extrabold flex items-center gap-1">
-          <svg viewBox="0 0 24 24" class="w-4 h-4 text-amber-700 fill-amber-500" stroke="currentColor" stroke-width="2">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-          </svg>
-          <span id="starCountText">0 / 6</span>
-        </div>
-      </div>
     </div>
   </header>
 
-  <!-- MAIN STAGE CONTAINER (Auto-scales per device from mobile phones to tablets & desktops) -->
+  <!-- MAIN STAGE CONTAINER (Full-featured stage on Computer/Tablet, slightly more compact on Smartphones) -->
   <main class="flex-1 flex items-center justify-center p-1.5 sm:p-3 md:p-4 overflow-y-auto">
-    <div id="stageWrapper" class="relative w-full max-w-6xl min-h-[500px] lg:min-h-[580px] rounded-2xl sm:rounded-3xl cartoon-box overflow-hidden flex flex-col justify-between transition-colors duration-500">
+    <div id="stageWrapper" class="relative w-full max-w-6xl min-h-[480px] sm:min-h-[540px] lg:min-h-[580px] rounded-2xl sm:rounded-3xl cartoon-box overflow-hidden flex flex-col justify-between transition-colors duration-500">
       
       <!-- Dynamic Sky / Weather Background Decorations (Sun, Clouds, Rain, Snow, Wind) -->
       <div id="weatherSkyLayer" class="absolute inset-0 pointer-events-none overflow-hidden z-0"></div>
 
       <!-- Ground Layer (Green Grass or White Snow) -->
-      <div id="groundLayer" class="absolute bottom-0 left-0 right-0 h-20 sm:h-28 border-t-4 border-gray-900 z-0 transition-colors duration-500" style="background-color: #2E9B47;"></div>
+      <div id="groundLayer" class="absolute bottom-0 left-0 right-0 h-16 sm:h-28 border-t-4 border-gray-900 z-0 transition-colors duration-500" style="background-color: #2E9B47;"></div>
 
       <!-- Foreground Content Area -->
-      <div id="screenContent" class="relative z-10 flex-1 flex flex-col justify-between p-2.5 sm:p-4 md:p-5">
+      <div id="screenContent" class="relative z-10 flex-1 flex flex-col justify-between p-2 sm:p-4 md:p-5">
         <!-- Rendered by JS for either Screen 1 (Vocab) or Screens 2-6 (Dress-Up) -->
       </div>
 
@@ -337,7 +353,7 @@
   </main>
 
   <!-- FOOTER BAR WITH QUICK TIPS -->
-  <footer class="bg-slate-800 text-slate-300 text-[11px] sm:text-xs py-1.5 px-3 text-center border-t border-slate-700 shrink-0">
+  <footer class="hidden sm:block bg-slate-800 text-slate-300 text-xs py-1.5 px-3 text-center border-t border-slate-700 shrink-0">
     <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-2">
       <span><strong>Tip:</strong> Tap any clothing card to hear it! In Dress-Up levels, <strong>tap or drag</strong> clothes onto the child.</span>
     </div>
@@ -1452,6 +1468,7 @@
     function switchSlide(index) {
       if (bounceTimeout) clearTimeout(bounceTimeout);
       if (introTimeout) clearTimeout(introTimeout);
+      if (typeof hideTouchDragGhost === 'function') hideTouchDragGhost();
       stopVocabQuizFlow();
       currentSlideIndex = index;
       const lvl = LEVELS[currentSlideIndex];
@@ -1499,7 +1516,7 @@
         return `
           <button
             onclick="switchSlide(${idx})"
-            class="cartoon-pill px-2.5 sm:px-3 py-1 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-1 shrink-0 transition-colors ${
+            class="cartoon-pill px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-extrabold flex items-center justify-center gap-1 w-full sm:w-auto truncate transition-colors ${
               isActive
                 ? 'bg-amber-400 text-gray-900'
                 : isDone
@@ -1507,9 +1524,9 @@
                   : 'bg-slate-100 text-gray-700 hover:bg-slate-200'
             }"
           >
-            <span>${lvl.tabLabel}</span>
+            <span class="truncate">${lvl.tabLabel}</span>
             ${isDone ? `
-              <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-amber-600 fill-amber-400" stroke="currentColor" stroke-width="2">
+              <svg viewBox="0 0 24 24" class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-600 fill-amber-400 shrink-0" stroke="currentColor" stroke-width="2">
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
               </svg>
             ` : ''}
@@ -2128,9 +2145,12 @@
         happy: 'react-happy'
       };
       const animClass = reactionAnimMap[reaction] || 'kawaii-idle';
+      const svgHeightClass = isVocabHost
+        ? 'w-full h-72 lg:h-[360px]'
+        : 'w-full h-44 sm:h-72 lg:h-[320px]';
 
       return `
-        <svg viewBox="0 0 260 440" class="w-full h-full max-h-[410px] drop-shadow-md select-none ${animClass}">
+        <svg viewBox="0 0 260 440" class="${svgHeightClass} drop-shadow-md select-none ${animClass}">
           <defs>
             <!-- Soft Airbrushed Mochi Skin Gradient -->
             <radialGradient id="${skinGradId}" cx="45%" cy="38%" r="60%">
@@ -2262,9 +2282,9 @@
     function renderDressUpCharacterSVG(characterType, worn, reaction) {
       const lvl = LEVELS[currentSlideIndex];
       return `
-        <div class="relative w-full h-full flex flex-col items-center justify-end">
+        <div class="relative w-full flex flex-col items-center justify-end">
           ${buildKawaiiCharacterSVG(characterType, worn, reaction, false)}
-          <div class="mt-0.5 bg-white/95 border-2 border-gray-900 rounded-full px-3 py-0.5 text-xs font-extrabold text-gray-900 shadow-sm flex items-center gap-1.5">
+          <div class="mt-0.5 bg-white/95 border-2 border-gray-900 rounded-full px-2.5 sm:px-3 py-0.5 text-[11px] sm:text-xs font-extrabold text-gray-900 shadow-sm flex items-center gap-1.5 shrink-0">
             <span>${lvl.genderLabel}: ${lvl.characterName}</span>
           </div>
         </div>
@@ -2299,7 +2319,7 @@
           <div
             onclick="handleVocabClick('${itemId}')"
             id="vocabCard_${itemId}"
-            class="relative group cursor-pointer flex flex-col items-center justify-between p-1.5 sm:p-2 rounded-2xl border-2 transition-all transform ${
+            class="relative group cursor-pointer flex flex-col items-center justify-between p-1 sm:p-2 rounded-xl sm:rounded-2xl border-2 transition-all transform ${
               isReviewPulsing
                 ? 'vocab-review-active border-amber-500'
                 : isFoundInQuiz
@@ -2308,19 +2328,19 @@
             }"
           >
             ${isFoundInQuiz ? `
-              <div class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-emerald-500 border-2 border-gray-900 text-white flex items-center justify-center shadow-sm z-10">
-                <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+              <div class="absolute top-1 right-1 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-500 border-2 border-gray-900 text-white flex items-center justify-center shadow-sm z-10">
+                <svg viewBox="0 0 24 24" class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="20 6 9 17 4 12"/>
                 </svg>
               </div>
             ` : ''}
-            <div class="w-20 h-16 sm:w-28 sm:h-22 md:w-32 md:h-24 flex items-center justify-center">
+            <div class="w-14 h-12 sm:w-28 sm:h-22 md:w-32 md:h-24 flex items-center justify-center min-h-0">
               ${renderCardItemSVG(itemId)}
             </div>
-            <div class="mt-1 w-full max-w-[140px] border-2 border-gray-900 rounded-lg ${
+            <div class="mt-0.5 sm:mt-1 w-full max-w-[140px] border-2 border-gray-900 rounded-md sm:rounded-lg ${
               isReviewPulsing ? 'bg-amber-300' : isFoundInQuiz ? 'bg-emerald-200' : 'bg-white group-hover:bg-amber-100'
-            } px-1.5 py-0.5 sm:px-2 sm:py-1 text-center shadow-sm transition-colors">
-              <span class="font-bold text-[11px] sm:text-sm text-gray-900 leading-tight block truncate">
+            } px-1 py-0.5 sm:px-2 sm:py-1 text-center shadow-sm transition-colors">
+              <span class="font-bold text-[10px] sm:text-sm text-gray-900 leading-tight block truncate">
                 ${(hideVocabLabels || vocabQuizState === 'quizzing' || vocabQuizState === 'quiz_intro') && !isFoundInQuiz ? '?' : item.name}
               </span>
             </div>
@@ -2329,24 +2349,24 @@
       };
 
       // Dynamic Banner Content based on vocabQuizState
-      let bannerTextHTML = activeVocabBannerHTML || `Click any piece of clothing to hear its name and an example sentence!`;
+      let bannerTextHTML = activeVocabBannerHTML || `Tap any piece of clothing to hear its name and sentence!`;
       if (vocabQuizState === 'reviewing') {
         const currentItem = CLOTHING_DB[lvl.vocabItems[vocabReviewIndex]];
         if (currentItem) {
           bannerTextHTML = `
-            <div class="flex flex-wrap items-center gap-2 text-amber-950">
-              <span class="px-2.5 py-0.5 rounded-full bg-amber-300 border-2 border-gray-900 text-xs font-black shrink-0">
+            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 text-amber-950">
+              <span class="px-2 py-0.5 rounded-full bg-amber-300 border-2 border-gray-900 text-[10px] sm:text-xs font-black shrink-0">
                 Review ${vocabReviewIndex + 1} / ${lvl.vocabItems.length}
               </span>
-              <span class="text-sm sm:text-base font-extrabold">
+              <span class="text-xs sm:text-base font-extrabold">
                 <strong class="uppercase underline text-sky-800">${currentItem.name}</strong>
               </span>
               ${vocabReviewSubphase === 'repeat' ? `
-                <span class="px-2.5 py-0.5 rounded-full bg-emerald-200 border-2 border-gray-900 text-emerald-950 text-xs sm:text-sm font-black animate-pulse">
+                <span class="px-2 py-0.5 rounded-full bg-emerald-200 border-2 border-gray-900 text-emerald-950 text-[10px] sm:text-sm font-black animate-pulse">
                   Say: "${currentItem.name}"
                 </span>
               ` : `
-                <span class="px-2 py-0.5 rounded-full bg-sky-100 border border-sky-800 text-sky-900 text-xs font-bold">
+                <span class="px-2 py-0.5 rounded-full bg-sky-100 border border-sky-800 text-sky-900 text-[10px] sm:text-xs font-bold">
                   Listen...
                 </span>
               `}
@@ -2355,19 +2375,19 @@
         }
       } else if (vocabQuizState === 'quiz_intro') {
         bannerTextHTML = `
-          <span class="inline-flex items-center gap-2 text-indigo-950 font-extrabold text-sm sm:text-lg">
-            <span class="px-3 py-0.5 rounded-full bg-amber-300 border-2 border-gray-900 text-xs sm:text-sm font-black">
+          <span class="inline-flex items-center gap-1.5 sm:gap-2 text-indigo-950 font-extrabold text-xs sm:text-lg">
+            <span class="px-2.5 py-0.5 rounded-full bg-amber-300 border-2 border-gray-900 text-[10px] sm:text-sm font-black">
               Quiz Time!
             </span>
-            <span>Listen carefully and find each piece of clothing!</span>
+            <span>Listen and find each piece of clothing!</span>
           </span>
         `;
       } else if (vocabQuizState === 'quizzing' && vocabQuizTarget) {
         const targetItem = CLOTHING_DB[vocabQuizTarget];
         if (vocabQuizPraiseText) {
           bannerTextHTML = `
-            <span class="inline-flex flex-wrap items-center gap-2 text-emerald-800 font-extrabold text-sm sm:text-lg">
-              <span class="px-2.5 py-0.5 rounded-full bg-emerald-200 border-2 border-gray-900 text-xs font-black">
+            <span class="inline-flex flex-wrap items-center gap-1.5 sm:gap-2 text-emerald-800 font-extrabold text-xs sm:text-lg">
+              <span class="px-2 py-0.5 rounded-full bg-emerald-200 border-2 border-gray-900 text-[10px] sm:text-xs font-black">
                 Found ${vocabQuizFound.size} / ${lvl.vocabItems.length}
               </span>
               <span>${vocabQuizPraiseText}</span>
@@ -2375,8 +2395,8 @@
           `;
         } else {
           bannerTextHTML = `
-            <span class="inline-flex flex-wrap items-center gap-2 text-indigo-950 text-sm sm:text-lg">
-              <span class="px-2.5 py-0.5 rounded-full bg-indigo-200 border-2 border-gray-900 text-xs font-black">
+            <span class="inline-flex flex-wrap items-center gap-1.5 sm:gap-2 text-indigo-950 text-xs sm:text-lg">
+              <span class="px-2 py-0.5 rounded-full bg-indigo-200 border-2 border-gray-900 text-[10px] sm:text-xs font-black">
                 Item ${vocabQuizFound.size + 1} of ${lvl.vocabItems.length}
               </span>
               <span>Find the <strong class="underline text-indigo-700 font-black uppercase px-1.5 py-0.5 bg-amber-200 rounded border border-gray-900">${targetItem.name}</strong>!</span>
@@ -2385,7 +2405,7 @@
         }
       } else if (vocabQuizState === 'completed') {
         bannerTextHTML = `
-          <span class="text-emerald-800 font-extrabold text-sm sm:text-lg">
+          <span class="text-emerald-800 font-extrabold text-xs sm:text-lg">
             Amazing job! You found all ${lvl.vocabItems.length} clothes! Moving to Sunny Weather...
           </span>
         `;
@@ -2393,23 +2413,23 @@
 
       container.innerHTML = `
         <!-- Top Row: Title + Mini-Quiz / Label Controls -->
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5 sm:mb-2">
+        <div class="flex flex-wrap items-center justify-between gap-1.5 mb-1 sm:mb-2 shrink-0">
           <div class="flex items-center gap-2">
-            <h2 class="font-kid text-xl sm:text-3xl md:text-4xl font-bold text-gray-900 tracking-tight drop-shadow-sm">
+            <h2 class="font-kid text-base sm:text-3xl md:text-4xl font-bold text-gray-900 tracking-tight drop-shadow-sm">
               Let’s practice our clothing
             </h2>
           </div>
 
-          <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
-            <button onclick="toggleVocabLabels()" class="cartoon-pill bg-white hover:bg-gray-100 text-gray-900 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1">
+          <div class="flex flex-wrap items-center gap-1 sm:gap-2">
+            <button onclick="toggleVocabLabels()" class="cartoon-pill bg-white hover:bg-gray-100 text-gray-900 px-2 sm:px-3 py-0.5 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-bold flex items-center gap-1">
               <span>${hideVocabLabels ? 'Show Words' : 'Hide Words'}</span>
             </button>
             ${vocabQuizState === 'idle' ? `
-              <button onclick="startVocabQuizPrompt()" class="cartoon-pill bg-amber-400 hover:bg-amber-300 text-gray-900 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-1.5">
+              <button onclick="startVocabQuizPrompt()" class="cartoon-pill bg-amber-400 hover:bg-amber-300 text-gray-900 px-2.5 sm:px-3.5 py-0.5 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-extrabold flex items-center gap-1">
                 <span>"Find It!" Quiz</span>
               </button>
             ` : `
-              <button onclick="stopVocabQuizAndRender()" class="cartoon-pill bg-rose-500 hover:bg-rose-400 text-white px-3 py-1 sm:py-1.5 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-1">
+              <button onclick="stopVocabQuizAndRender()" class="cartoon-pill bg-rose-500 hover:bg-rose-400 text-white px-2.5 py-0.5 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-extrabold flex items-center gap-1">
                 <span>Stop Quiz</span>
               </button>
             `}
@@ -2417,29 +2437,29 @@
         </div>
 
         <!-- Speech / Quiz Prompt Banner -->
-        <div id="vocabPromptBanner" class="mb-2 bg-white/95 border-3 border-gray-900 rounded-2xl px-3 sm:px-4 py-1.5 sm:py-2 shadow flex flex-wrap items-center justify-between gap-2">
-          <div class="flex items-center gap-2 text-xs sm:text-base font-bold text-gray-800">
+        <div id="vocabPromptBanner" class="mb-1.5 sm:mb-2 bg-white/95 border-2 sm:border-3 border-gray-900 rounded-xl sm:rounded-2xl px-2.5 sm:px-4 py-1 sm:py-2 shadow flex flex-wrap items-center justify-between gap-1.5 shrink-0">
+          <div class="flex items-center gap-1.5 text-[11px] sm:text-base font-bold text-gray-800 leading-tight">
             <span id="vocabBannerText">${bannerTextHTML}</span>
           </div>
-          <div class="flex items-center gap-1.5">
+          <div class="flex items-center gap-1">
             ${vocabQuizState === 'reviewing' ? `
-              <button onclick="advanceVocabReviewStepManually()" class="cartoon-pill bg-sky-200 hover:bg-sky-300 px-2.5 py-1 rounded-lg text-xs font-extrabold text-gray-900">
+              <button onclick="advanceVocabReviewStepManually()" class="cartoon-pill bg-sky-200 hover:bg-sky-300 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-extrabold text-gray-900">
                 Next Word
               </button>
-              <button onclick="beginVocabQuizPhase()" class="cartoon-pill bg-amber-300 hover:bg-amber-200 px-2.5 py-1 rounded-lg text-xs font-extrabold text-gray-900">
+              <button onclick="beginVocabQuizPhase()" class="cartoon-pill bg-amber-300 hover:bg-amber-200 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-extrabold text-gray-900">
                 Skip Review
               </button>
             ` : ''}
             ${vocabQuizState === 'quizzing' && vocabQuizTarget ? `
-              <button onclick="speakText('Find the ' + CLOTHING_DB[vocabQuizTarget].name)" class="cartoon-pill bg-sky-200 hover:bg-sky-300 px-2.5 py-1 rounded-lg text-xs font-extrabold text-gray-900">
+              <button onclick="speakText('Find the ' + CLOTHING_DB[vocabQuizTarget].name)" class="cartoon-pill bg-sky-200 hover:bg-sky-300 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-extrabold text-gray-900">
                 Repeat Word
               </button>
             ` : ''}
           </div>
         </div>
 
-        <!-- Main Split Layout: Girl on Left, White Framed Board on Right -->
-        <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-end">
+        <!-- Main Split Layout: Girl on Left, White Framed Board on Right (Fits 3 rows of 4/4/3 on Mobile without scrolling!) -->
+        <div class="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-2 sm:gap-4 items-stretch lg:items-end">
           <!-- Left: Cheerful Girl Character (Matches Slide 1) -->
           <div class="hidden lg:flex lg:col-span-3 h-full items-end justify-center">
             <div onclick="speakText('Let\\'s practice our clothing together!')" class="cursor-pointer w-full h-full flex items-end justify-center hover:scale-[1.02] transition-transform" title="Click me!">
@@ -2447,18 +2467,18 @@
             </div>
           </div>
 
-          <!-- Right: White Framed Vocabulary Board with 3 Rows -->
-          <div class="lg:col-span-9 bg-white cartoon-box rounded-xl p-2 sm:p-4 flex flex-col justify-between gap-1.5 sm:gap-2">
+          <!-- Right: White Framed Vocabulary Board with 3 Compact Rows -->
+          <div class="lg:col-span-9 bg-white cartoon-box rounded-xl p-1.5 sm:p-4 flex flex-col justify-around gap-1 sm:gap-2 h-full min-h-0">
             <!-- Row 1 (4 items) -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
+            <div class="grid grid-cols-4 gap-1 sm:gap-2">
               ${row1.map((id, i) => renderVocabCard(id, i)).join('')}
             </div>
             <!-- Row 2 (4 items) -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
+            <div class="grid grid-cols-4 gap-1 sm:gap-2">
               ${row2.map((id, i) => renderVocabCard(id, i + 4)).join('')}
             </div>
             <!-- Row 3 (3 footwear items centered) -->
-            <div class="grid grid-cols-3 gap-1.5 sm:gap-2 max-w-2xl mx-auto w-full">
+            <div class="grid grid-cols-3 gap-1 sm:gap-2 max-w-2xl mx-auto w-full">
               ${row3.map((id, i) => renderVocabCard(id, i + 8)).join('')}
             </div>
           </div>
@@ -2757,18 +2777,19 @@
         `;
       }
 
-      // Adaptive grid columns & card sizes so 9-item levels (Snowy) fit in 2 rows on desktop and 3 compact rows on mobile
+      // Responsive Grid: Compact 4 or 5 columns on smartphones (<640px) so it takes only 2 rows,
+      // and original spacious 3/4/5 columns on tablets and computers (sm: and md:)
       const gridColsClass = isManyItems
-        ? 'grid-cols-3 sm:grid-cols-3 md:grid-cols-5 gap-1.5 sm:gap-2'
-        : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-2.5';
+        ? 'grid-cols-5 sm:grid-cols-3 md:grid-cols-5 gap-1.5 sm:gap-2'
+        : 'grid-cols-4 sm:grid-cols-3 md:grid-cols-4 gap-1.5 sm:gap-2.5';
 
       const cardIconSizeClass = isManyItems
-        ? 'w-16 h-16 sm:w-20 sm:h-20 md:w-22 md:h-22'
-        : 'w-20 h-20 sm:w-24 sm:h-24';
+        ? 'w-12 h-12 sm:w-20 sm:h-20 md:w-22 md:h-22'
+        : 'w-14 h-14 sm:w-24 sm:h-24';
 
       container.innerHTML = `
         <!-- Main Split Area: Child + Speech Bubble on Left, Instruction + Wardrobe on Right -->
-        <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-2.5 sm:gap-4 items-end my-auto">
+        <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-2 sm:gap-4 items-end my-auto">
           
           <!-- Left Column: Interactive Child Character with Speech Bubble Anchored Directly Next to Head -->
           <div class="lg:col-span-5 flex flex-col items-center justify-end h-full relative">
@@ -2776,25 +2797,25 @@
             <!-- Dynamic Pedagogical Feedback / Hint (Only appears after failing or winning) -->
             ${feedbackBannerHTML}
 
-            <!-- Character SVG Container (Drop Target) with Speech Bubble Attached Right Next to Mouth/Head -->
+            <!-- Character SVG Container (Drop Target) with Explicit Responsive Height so SVG Never Collapses -->
             <div
               id="characterDropZone"
               ondragover="handleDragOver(event)"
               ondragleave="handleDragLeave(event)"
               ondrop="handleDropOnChild(event)"
-              class="relative w-44 sm:w-56 md:w-60 h-64 sm:h-80 md:h-88 flex items-end justify-center transition-all p-1"
+              class="relative w-40 sm:w-56 md:w-60 h-52 sm:h-80 lg:h-[350px] flex items-end justify-center transition-all p-1"
             >
               ${thoughtBubbleVisible ? `
                 <div
                   onclick="playWeatherIntroSequence(LEVELS[currentSlideIndex])"
                   title="Click to hear again!"
-                  class="thought-bubble-enter cursor-pointer group absolute top-[6%] left-[64%] sm:left-[68%] z-30 bg-white border-4 border-gray-900 rounded-3xl px-3 sm:px-4 py-1.5 sm:py-2 shadow-[4px_5px_0_#FDE047] hover:scale-105 transition-transform w-max max-w-[145px] sm:max-w-[195px]"
+                  class="thought-bubble-enter cursor-pointer group absolute top-[6%] left-[64%] sm:left-[68%] z-30 bg-white border-3 sm:border-4 border-gray-900 rounded-2xl sm:rounded-3xl px-2.5 sm:px-4 py-1 sm:py-2 shadow-[4px_5px_0_#FDE047] hover:scale-105 transition-transform w-max max-w-[135px] sm:max-w-[195px]"
                 >
-                  <p class="font-kid text-sm sm:text-lg md:text-xl font-bold text-gray-900 text-center leading-tight">
+                  <p class="font-kid text-xs sm:text-lg md:text-xl font-bold text-gray-900 text-center leading-tight">
                     ${lvl.thoughtHtml}
                   </p>
                   <!-- Direct Speech Pointer Tail Pointing to the Character's Mouth/Cheek -->
-                  <svg viewBox="0 0 32 24" class="absolute top-1/2 -left-[20px] -translate-y-1/2 w-5 h-4 sm:w-6 sm:h-5 overflow-visible pointer-events-none">
+                  <svg viewBox="0 0 32 24" class="absolute top-1/2 -left-[18px] sm:-left-[20px] -translate-y-1/2 w-5 h-4 sm:w-6 sm:h-5 overflow-visible pointer-events-none">
                     <path d="M24,2 L2,14 L24,20 Z" fill="#FFFFFF" stroke="#111827" stroke-width="4" stroke-linejoin="round"/>
                     <path d="M22,4 L26,4 L26,18 L22,18 Z" fill="#FFFFFF"/>
                   </svg>
@@ -2805,7 +2826,7 @@
             </div>
 
             <!-- Currently Worn Pills (Click to remove individual item) -->
-            <div class="min-h-[26px] flex flex-wrap items-center justify-center gap-1 mt-0.5">
+            <div class="min-h-[24px] sm:min-h-[26px] flex flex-wrap items-center justify-center gap-1 mt-0.5">
               ${wornList.length === 0
                 ? `<span class="text-[11px] sm:text-xs font-bold text-white bg-gray-900/65 px-2.5 py-0.5 rounded-full">Tap or drag clothes onto ${lvl.characterName}</span>`
                 : wornList.map(item => `
@@ -2818,31 +2839,31 @@
             </div>
           </div>
 
-          <!-- Right Column: Instruction Text + White Wardrobe Box + Non-Obscuring Big Reset Icon Button -->
-          <div class="lg:col-span-7 flex flex-col justify-end gap-2">
+          <!-- Right Column: Instruction Text + White Wardrobe Box + Big Reset Icon Button -->
+          <div class="lg:col-span-7 flex flex-col justify-end gap-1.5 sm:gap-2">
             
             <!-- Instruction Row above Wardrobe Box -->
-            <div class="flex items-center justify-between gap-2.5 bg-white/95 border-3 border-gray-900 rounded-2xl px-3.5 py-1.5 sm:py-2 shadow-sm">
+            <div class="flex items-center justify-between gap-2.5 bg-white/95 border-2 sm:border-3 border-gray-900 rounded-xl sm:rounded-2xl px-3 sm:px-3.5 py-1.5 sm:py-2 shadow-sm">
               <p class="font-extrabold text-gray-900 text-xs sm:text-base leading-snug">
                 ${lvl.instruction}
               </p>
 
-              <!-- Big, Obvious Icon-Only Reset Button (Placed cleanly outside sky/character visuals) -->
+              <!-- Big, Obvious Icon-Only Reset Button -->
               <button
                 onclick="clearOutfit()"
                 aria-label="Reset Outfit"
                 title="Reset Outfit"
-                class="cartoon-pill shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-rose-500 hover:bg-rose-400 active:bg-rose-600 text-white flex items-center justify-center shadow-md hover:rotate-[-25deg] transition-transform"
+                class="cartoon-pill shrink-0 w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-rose-500 hover:bg-rose-400 active:bg-rose-600 text-white flex items-center justify-center shadow-md hover:rotate-[-25deg] transition-transform"
               >
-                <svg viewBox="0 0 24 24" class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" class="w-5 h-5 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M3 12a9 9 0 1 0 3-6.7L3 8"/>
                   <path d="M3 3v5h5"/>
                 </svg>
               </button>
             </div>
 
-            <!-- White Wardrobe Box (Compact & Responsive so Next Level Button is ALWAYS inside the viewable screen) -->
-            <div class="bg-white cartoon-box rounded-xl p-2.5 sm:p-4 flex flex-col justify-between">
+            <!-- White Wardrobe Box -->
+            <div class="bg-white cartoon-box rounded-xl p-2 sm:p-4 flex flex-col justify-between">
               <div class="grid ${gridColsClass} my-auto">
                 ${lvl.wardrobe.map(itemId => {
                   const item = CLOTHING_DB[itemId];
@@ -2851,9 +2872,8 @@
                     <div
                       draggable="true"
                       ondragstart="handleDragStart(event, '${itemId}')"
-                      onpointerdown="handleTouchDragStart(event, '${itemId}')"
                       onclick="equipOrToggleItem('${itemId}')"
-                      class="group cursor-pointer rounded-2xl border-2 p-1.5 sm:p-2 flex flex-col items-center justify-between transition-all select-none touch-manipulation ${
+                      class="group cursor-pointer rounded-xl sm:rounded-2xl border-2 p-1 sm:p-2 flex flex-col items-center justify-between transition-all select-none touch-manipulation ${
                         isCurrentlyWorn
                           ? 'border-emerald-600 bg-emerald-50 ring-2 ring-emerald-400 scale-[0.98]'
                           : 'border-gray-200 hover:border-gray-900 hover:bg-sky-50 hover:-translate-y-0.5 active:scale-95'
@@ -2863,7 +2883,7 @@
                         ${renderCardItemSVG(itemId)}
                       </div>
                       <div class="mt-0.5 flex items-center gap-1 w-full justify-center">
-                        <span class="text-[11px] sm:text-xs md:text-sm font-bold text-gray-800 group-hover:text-gray-900 text-center leading-tight truncate">
+                        <span class="text-[10px] sm:text-xs md:text-sm font-bold text-gray-800 group-hover:text-gray-900 text-center leading-tight truncate">
                           ${item.name}
                         </span>
                       </div>
@@ -2872,20 +2892,20 @@
                 }).join('')}
               </div>
 
-              <!-- Next Level Celebration Bar when Outfit is Complete (Always visible inside the box) -->
+              <!-- Next Level Celebration Bar when Outfit is Complete -->
               ${status.isComplete ? `
-                <div id="nextLevelBar" class="mt-2.5 bg-emerald-100 border-3 border-emerald-800 rounded-xl p-2 sm:p-2.5 flex flex-wrap items-center justify-between gap-2 shadow-sm">
+                <div id="nextLevelBar" class="mt-2 sm:mt-2.5 bg-emerald-100 border-2 sm:border-3 border-emerald-800 rounded-xl p-2 sm:p-2.5 flex flex-wrap items-center justify-between gap-2 shadow-sm">
                   <div class="flex items-center gap-2">
                     <p class="font-kid font-bold text-emerald-950 text-xs sm:text-base">
                       Awesome Job! Perfect outfit for ${lvl.weatherKey} weather!
                     </p>
                   </div>
                   ${currentSlideIndex < LEVELS.length - 1 ? `
-                    <button onclick="switchSlide(${currentSlideIndex + 1})" class="cartoon-pill bg-amber-400 hover:bg-amber-300 text-gray-900 px-3.5 sm:px-4 py-1.5 rounded-xl font-extrabold text-xs sm:text-sm shrink-0">
+                    <button onclick="switchSlide(${currentSlideIndex + 1})" class="cartoon-pill bg-amber-400 hover:bg-amber-300 text-gray-900 px-3 sm:px-4 py-1 sm:py-1.5 rounded-xl font-extrabold text-xs sm:text-sm shrink-0">
                       Next Weather Level
                     </button>
                   ` : `
-                    <button onclick="switchSlide(0)" class="cartoon-pill bg-amber-400 hover:bg-amber-300 text-gray-900 px-3.5 sm:px-4 py-1.5 rounded-xl font-extrabold text-xs sm:text-sm shrink-0">
+                    <button onclick="switchSlide(0)" class="cartoon-pill bg-amber-400 hover:bg-amber-300 text-gray-900 px-3 sm:px-4 py-1 sm:py-1.5 rounded-xl font-extrabold text-xs sm:text-sm shrink-0">
                       All Done! Back to Start
                     </button>
                   `}
@@ -2906,12 +2926,19 @@
     }
 
     /*************************************************************************
-     * 9. EQUIP / DRAG-AND-DROP (MOUSE & MOBILE TOUCH) / WEATHER VALIDATION
+     * 9. EQUIP / DRAG-AND-DROP (MOUSE & MOBILE TAP) / WEATHER VALIDATION
      *************************************************************************/
     let draggedItemId = null;
-    let touchDragItem = null;
-    let touchStartPos = null;
-    let isTouchDragging = false;
+
+    function hideTouchDragGhost() {
+      const ghost = document.getElementById('touchDragGhost');
+      if (ghost) {
+        ghost.style.display = 'none';
+        ghost.innerHTML = '';
+      }
+      const dz = document.getElementById('characterDropZone');
+      if (dz) dz.classList.remove('drop-zone-active');
+    }
 
     function handleDragStart(e, itemId) {
       draggedItemId = itemId;
@@ -2939,62 +2966,9 @@
       }
     }
 
-    // Smooth Touch Dragging for Smartphones & Tablets
-    function handleTouchDragStart(e, itemId) {
-      if (e.pointerType !== 'touch') return;
-      touchDragItem = itemId;
-      touchStartPos = { x: e.clientX, y: e.clientY };
-      isTouchDragging = false;
-    }
-
-    window.addEventListener('pointermove', (e) => {
-      if (!touchDragItem || e.pointerType !== 'touch') return;
-      const dx = e.clientX - touchStartPos.x;
-      const dy = e.clientY - touchStartPos.y;
-      if (!isTouchDragging && Math.hypot(dx, dy) > 12) {
-        isTouchDragging = true;
-        const ghost = document.getElementById('touchDragGhost');
-        if (ghost) {
-          ghost.innerHTML = renderCardItemSVG(touchDragItem);
-          ghost.style.display = 'block';
-        }
-      }
-      if (isTouchDragging) {
-        const ghost = document.getElementById('touchDragGhost');
-        if (ghost) {
-          ghost.style.left = `${e.clientX}px`;
-          ghost.style.top = `${e.clientY}px`;
-        }
-        const dz = document.getElementById('characterDropZone');
-        if (dz) {
-          const rect = dz.getBoundingClientRect();
-          const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
-          dz.classList.toggle('drop-zone-active', inside);
-        }
-      }
-    }, { passive: true });
-
-    window.addEventListener('pointerup', (e) => {
-      if (!touchDragItem || e.pointerType !== 'touch') return;
-      const ghost = document.getElementById('touchDragGhost');
-      if (ghost) ghost.style.display = 'none';
-
-      const dz = document.getElementById('characterDropZone');
-      if (dz) dz.classList.remove('drop-zone-active');
-
-      if (isTouchDragging && dz) {
-        const rect = dz.getBoundingClientRect();
-        const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
-        if (inside) {
-          equipOrToggleItem(touchDragItem, true);
-        }
-      }
-      touchDragItem = null;
-      isTouchDragging = false;
-    });
-
     function equipOrToggleItem(itemId, forceEquip = false) {
       if (bounceTimeout) clearTimeout(bounceTimeout);
+      hideTouchDragGhost();
 
       const lvl = LEVELS[currentSlideIndex];
       const item = CLOTHING_DB[itemId];

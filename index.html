@@ -493,36 +493,57 @@
     // Scores American English voices so the clearest, most natural US voice is always chosen
     function scoreAmericanVoice(voice) {
       const name = String(voice.name || '');
+      const uri = String(voice.voiceURI || '');
       const lang = normalizeLangTag(voice.lang);
       let score = 100;
 
-      if (lang === 'en-us' || lang.startsWith('en-us-')) score += 50;
+      if (lang === 'en-us' || lang.startsWith('en-us-')) score += 60;
+
+      // Boost Apple's Premium / Enhanced neural voices and Microsoft's Natural neural voices
+      if (/premium|natural|neural/i.test(name) || /premium/i.test(uri)) score += 90;
+      else if (/enhanced|online| compact/i.test(name) || /enhanced/i.test(uri)) score += 45;
 
       const topTierPatterns = [
-        { pattern: /microsoft (aria|jenny|ana) online.*natural/i, bonus: 120 },
-        { pattern: /google us english/i, bonus: 115 },
-        { pattern: /\b(ava|allison|samantha|nicky)\b.*(enhanced|premium)/i, bonus: 112 },
-        { pattern: /\bsamantha\b/i, bonus: 105 },
-        { pattern: /\b(ava|nicky|allison)\b/i, bonus: 100 },
-        { pattern: /microsoft (aria|jenny|ana|zira)/i, bonus: 95 },
-        { pattern: /en-us-x-(sfg|tpf|iob|iom)/i, bonus: 90 },
-        { pattern: /united states|us english|米国|アメリカ/i, bonus: 80 },
-        { pattern: /\b(victoria|kathy|vicki|alex|tom|evan|nathan|aaron)\b/i, bonus: 70 },
-        { pattern: /microsoft (david|mark|guy|christopher|eric|steffan)/i, bonus: 65 }
+        // Windows 10/11 & Edge Neural Natural US Voices (Best on PC)
+        { pattern: /microsoft (aria|jenny|ana|michelle|ava|emma|andrew|brian|guy|christopher|eric|roger|steffan) online.*natural/i, bonus: 160 },
+        // macOS / iOS / iPadOS Premium & Enhanced Neural US Voices (Best on Apple & Brave macOS/iOS)
+        { pattern: /\b(ava|allison|samantha|nicky|zoe|evan|noah|tom)\b.*(premium|enhanced)/i, bonus: 155 },
+        // Chrome Desktop & Android High-Quality US Voices
+        { pattern: /google us english/i, bonus: 145 },
+        // Standard Apple US Voices (Samantha & Ava have the clearest diction for ESL learners)
+        { pattern: /\b(ava|samantha)\b/i, bonus: 135 },
+        { pattern: /\b(allison|nicky|zoe|siri)\b/i, bonus: 128 },
+        // Android Google TTS Neural US Network & Local Voices (sfg/tpf/iob/iol)
+        { pattern: /en-us-x-(sfg|tpf|iob|iol|iom|tpd)/i, bonus: 125 },
+        // Windows Local SAPI US Voices (Used by Brave on Windows PCs)
+        { pattern: /microsoft (zira|aria|jenny|ana|eva)/i, bonus: 118 },
+        { pattern: /microsoft (david|mark|guy|christopher|eric|steffan|andrew|brian)/i, bonus: 105 },
+        // Other clear Apple macOS US voices
+        { pattern: /\b(alex|tom|evan|nathan|aaron|victoria|kathy|vicki)\b/i, bonus: 95 },
+        { pattern: /united states|us english|米国|アメリカ/i, bonus: 80 }
       ];
 
       for (const item of topTierPatterns) {
-        if (item.pattern.test(name)) {
+        if (item.pattern.test(name) || item.pattern.test(uri)) {
           score += item.bonus;
           break;
         }
       }
 
-      if (/female|samantha|ava|nicky|allison|zira|aria|jenny|ana|victoria/i.test(name)) {
-        score += 10;
+      // Friendly, warm voices are easier for A1-A2 young ESL learners to shadow
+      if (/female|samantha|ava|nicky|allison|zoe|zira|aria|jenny|ana|michelle|victoria|sfg|tpf|iob/i.test(name)) {
+        score += 15;
       }
 
       return score;
+    }
+
+    // Detects Brave Browser (or strict privacy browsers) via navigator.brave
+    let isBraveBrowserCached = false;
+    if (navigator.brave && typeof navigator.brave.isBrave === 'function') {
+      navigator.brave.isBrave().then(res => { isBraveBrowserCached = Boolean(res); }).catch(() => {});
+    } else if (/Brave/i.test(navigator.userAgent || '')) {
+      isBraveBrowserCached = true;
     }
 
     function selectBestAmericanEnglishVoice() {
@@ -530,8 +551,19 @@
       const voices = window.speechSynthesis.getVoices();
       if (!voices || voices.length === 0) return null;
 
+      // In Brave Browser, Google's remote Chrome TTS servers are blocked by Brave and fail silently.
+      // Filter out remote-only Google voices in Brave so it picks a working local OS voice (e.g., Samantha or Microsoft Zira).
+      const usableVoices = voices.filter(v => {
+        if (isBraveBrowserCached && /google/i.test(v.name) && v.localService === false) {
+          return false;
+        }
+        return true;
+      });
+
+      const pool = usableVoices.length > 0 ? usableVoices : voices;
+
       // 1. Priority 1: Strictly verified American English (en-US) voices
-      const usVoices = voices.filter(isAmericanEnglishVoice);
+      const usVoices = pool.filter(isAmericanEnglishVoice);
       if (usVoices.length > 0) {
         usVoices.sort((a, b) => scoreAmericanVoice(b) - scoreAmericanVoice(a));
         preferredUSVoice = usVoices[0];
@@ -539,7 +571,7 @@
       }
 
       // 2. Priority 2: Any verified English (en-*) voice (never Japanese)
-      const fallbackEngVoices = voices.filter(v => !isBlockedVoicePersona(v));
+      const fallbackEngVoices = pool.filter(v => !isBlockedVoicePersona(v));
       if (fallbackEngVoices.length > 0) {
         preferredUSVoice = fallbackEngVoices[0];
         return preferredUSVoice;
@@ -653,8 +685,38 @@
           utter.rate = 0.84; // Clear A1-A2 beginner pace
           utter.pitch = 1.04;
 
-          utter.onend = () => setTimeout(done, 140);
-          utter.onerror = () => setTimeout(done, 180);
+          // Watchdog for Brave / Chromium: if a voice fails to start speaking within 700ms
+          // (or finishes in <80ms without producing sound), automatically fall back to Cloud en-US audio
+          const startTimestamp = Date.now();
+          let speechStarted = false;
+          utter.onstart = () => { speechStarted = true; };
+
+          const silentFailWatchdog = setTimeout(() => {
+            if (!speechStarted && myToken === activeSpeechToken && !callbackFired) {
+              if (backupTimer) clearTimeout(backupTimer);
+              playCloudAmericanTTSStream(text, myToken, onEndCallback, true);
+            }
+          }, 700);
+
+          utter.onend = () => {
+            clearTimeout(silentFailWatchdog);
+            const elapsed = Date.now() - startTimestamp;
+            if (elapsed < 80 && myToken === activeSpeechToken && !callbackFired) {
+              if (backupTimer) clearTimeout(backupTimer);
+              playCloudAmericanTTSStream(text, myToken, onEndCallback, true);
+              return;
+            }
+            setTimeout(done, 140);
+          };
+          utter.onerror = () => {
+            clearTimeout(silentFailWatchdog);
+            if (myToken === activeSpeechToken && !callbackFired) {
+              if (backupTimer) clearTimeout(backupTimer);
+              playCloudAmericanTTSStream(text, myToken, onEndCallback, true);
+              return;
+            }
+            setTimeout(done, 180);
+          };
 
           window.speechSynthesis.speak(utter);
         };
@@ -670,8 +732,8 @@
     }
 
     // Primary Cloud Native American English (en-US) Streamer for Desktop PCs (and fallback for devices without English TTS)
-    // Uses persistent <audio> to stream real American English audio from Youdao (type=2 US) and Google (en-US)
-    function playCloudAmericanTTSStream(text, myToken, onEndCallback) {
+    // Uses persistent <audio> to stream real American English audio across Brave-Shields-friendly and standard US TTS endpoints
+    function playCloudAmericanTTSStream(text, myToken, onEndCallback, skipNativeFallback = false) {
       const player = getPersistentAudioPlayer();
       stopPersistentAudioPlayer();
       player.muted = false;
@@ -696,6 +758,11 @@
       const encoded = encodeURIComponent(text);
       const cloudUrls = [
         {
+          // StreamElements Joanna (AWS Polly Neural-grade US Female Voice - CORS-friendly & not blocked by Brave Shields)
+          url: `https://api.streamelements.com/kappa/v2/speech?voice=Joanna&text=${encoded}`,
+          label: 'Cloud American English (US Joanna)'
+        },
+        {
           url: `https://dict.youdao.com/dictvoice?type=2&audio=${encoded}`,
           label: 'Cloud American English (Youdao en-US)'
         },
@@ -706,36 +773,56 @@
       ];
 
       let urlIdx = 0;
+      let streamTimeout = null;
 
       const tryNextCloudStream = () => {
+        if (streamTimeout) {
+          clearTimeout(streamTimeout);
+          streamTimeout = null;
+        }
         if (myToken !== activeSpeechToken || callbackFired) return;
 
-        // If offline or both cloud streams are blocked, fall back ONLY to a verified English voice (never null on PC!)
+        // If offline or all cloud streams are blocked by strict shields, fall back to a verified English OS voice
         if (urlIdx >= cloudUrls.length) {
-          const verifiedVoice = selectBestAmericanEnglishVoice();
-          if (verifiedVoice) {
-            if (backupTimer) {
-              clearTimeout(backupTimer);
-              backupTimer = null;
+          if (!skipNativeFallback) {
+            const verifiedVoice = selectBestAmericanEnglishVoice();
+            if (verifiedVoice) {
+              if (backupTimer) {
+                clearTimeout(backupTimer);
+                backupTimer = null;
+              }
+              speakWithNativeWebSpeech(text, myToken, onEndCallback, verifiedVoice);
             }
-            speakWithNativeWebSpeech(text, myToken, onEndCallback, verifiedVoice);
           }
           return;
         }
 
         const currentSource = cloudUrls[urlIdx++];
         try {
-          player.onended = () => setTimeout(done, 140);
+          player.onended = () => {
+            if (streamTimeout) clearTimeout(streamTimeout);
+            setTimeout(done, 140);
+          };
           player.onerror = () => tryNextCloudStream();
 
           player.src = currentSource.url;
           player.playbackRate = 0.92;
           player.defaultPlaybackRate = 0.92;
 
+          // If Brave Shields hangs a network request without rejecting immediately, switch after 1400ms
+          streamTimeout = setTimeout(() => {
+            if (player.paused || player.readyState < 2) {
+              tryNextCloudStream();
+            }
+          }, 1400);
+
           const playPromise = player.play();
           if (playPromise !== undefined) {
             playPromise
-              .then(() => updateVoiceButtonTooltip(currentSource.label))
+              .then(() => {
+                if (streamTimeout) clearTimeout(streamTimeout);
+                updateVoiceButtonTooltip(currentSource.label);
+              })
               .catch(() => tryNextCloudStream());
           }
         } catch (err) {
@@ -847,9 +934,17 @@
       isAudioSpeaking = true;
 
       // DESKTOP PC PATH (Windows / Mac / Linux):
-      // Always use the Dual-Engine Cloud American English (en-US) stream first so Japanese Windows PCs
-      // NEVER use local Japanese SAPI voices, and fall back only to a verified English voice if offline.
+      // 1. If a verified American English local OS voice is installed (e.g., Apple Samantha/Ava on Mac,
+      //    or Microsoft Zira/Aria/Jenny on Windows), use it directly! This guarantees instant playback in
+      //    Brave Browser (where Brave Shields or Autoplay policy blocks async cross-origin <audio> streams).
+      // 2. If NO verified English OS voice is installed (e.g., a Japanese Windows PC with only Haruka installed),
+      //    use the multi-provider Cloud American English stream (Joanna -> Youdao -> Google en-US).
       if (isDesktopPC()) {
+        const verifiedDesktopUSVoice = selectBestAmericanEnglishVoice();
+        if (verifiedDesktopUSVoice) {
+          speakWithNativeWebSpeech(text, myToken, onEndCallback, verifiedDesktopUSVoice);
+          return;
+        }
         if ('speechSynthesis' in window) {
           try { window.speechSynthesis.cancel(); } catch (e) {}
         }

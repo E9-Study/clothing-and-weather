@@ -343,8 +343,8 @@
       <!-- Dynamic Sky / Weather Background Decorations (Sun, Clouds, Rain, Snow, Wind) -->
       <div id="weatherSkyLayer" class="absolute inset-0 pointer-events-none overflow-hidden z-0"></div>
 
-      <!-- Ground Layer (Green Grass or White Snow) -->
-      <div id="groundLayer" class="absolute bottom-0 left-0 right-0 h-16 sm:h-28 border-t-4 border-gray-900 z-0 transition-colors duration-500" style="background-color: #2E9B47;"></div>
+      <!-- Ground Layer (Raised on Smartphones during Dress-Up so character stands on the grass/snow; unchanged sm:h-28 on Tablet/Computer) -->
+      <div id="groundLayer" class="absolute bottom-0 left-0 right-0 h-16 sm:h-28 border-t-4 border-gray-900 z-0 transition-all duration-500" style="background-color: #2E9B47;"></div>
 
       <!-- Foreground Content Area -->
       <div id="screenContent" class="relative z-10 flex-1 flex flex-col justify-between p-2 sm:p-4 md:p-5">
@@ -367,18 +367,26 @@
   <script>
     /*************************************************************************
      * 1. CROSS-PLATFORM AMERICAN ENGLISH (en-US) SPEECH & SOUND SYSTEM
-     *    - Works on iOS, iPadOS, macOS, Android, and Windows PCs (even when
-     *      the device OS language is set to Japanese!).
-     *    - Allows English voices whose OS display name is localized in Japanese
-     *      (e.g. "英語 (米国)" / "アメリカ合衆国") while blocking Japanese
-     *      persona voices (Haruka, Kyoko, Otoya, Ichiro, Ayumi, etc.).
-     *    - Calls speechSynthesis synchronously within user gestures so mobile
-     *      browsers never block audio playback, and uses Cloud en-US audio
-     *      automatically if a Windows PC has zero English voices installed.
+     *    - Mobile & Tablet (iOS, iPadOS, Android): Uses synchronous native
+     *      American English Web Speech inside user gestures for instant response.
+     *    - Desktop PCs (Windows/Mac): Uses Dual-Engine Cloud American English
+     *      (en-US) streaming first + hardened en-US Web Speech fallback, and
+     *      STRICTLY FORBIDS calling speechSynthesis without a verified English
+     *      SpeechSynthesisVoice object (preventing Japanese Windows SAPI from
+     *      ever substituting Haruka/Japanese TTS).
      *************************************************************************/
     let voiceEnabled = true;
     let audioCtx = null;
     let preferredUSVoice = null;
+    let cloudAudioUnlocked = false;
+
+    // Detect if the user is on a Desktop/Laptop PC vs Mobile/Tablet
+    function isDesktopPC() {
+      const ua = navigator.userAgent || '';
+      const isMobileOrTablet = /Android|iPhone|iPad|iPod|Mobile/i.test(ua) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      return !isMobileOrTablet;
+    }
 
     function getPersistentAudioPlayer() {
       let player = document.getElementById('cloudTtsPlayer');
@@ -392,6 +400,31 @@
       }
       return player;
     }
+
+    // Unlock persistent HTML5 <audio> on first user interaction so delayed speech (e.g. 750ms weather intro) never gets blocked on PC
+    function unlockCloudAudioOnGesture() {
+      if (cloudAudioUnlocked) return;
+      cloudAudioUnlocked = true;
+      try {
+        const player = getPersistentAudioPlayer();
+        player.muted = true;
+        player.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+        const p = player.play();
+        if (p !== undefined) {
+          p.then(() => {
+            player.pause();
+            player.muted = false;
+            player.removeAttribute('src');
+          }).catch(() => {
+            player.muted = false;
+          });
+        } else {
+          player.muted = false;
+        }
+      } catch (e) {}
+    }
+    window.addEventListener('pointerdown', unlockCloudAudioOnGesture, { once: true, passive: true });
+    window.addEventListener('keydown', unlockCloudAudioOnGesture, { once: true, passive: true });
 
     function stopPersistentAudioPlayer() {
       const player = document.getElementById('cloudTtsPlayer');
@@ -409,19 +442,28 @@
       return String(lang || '').trim().replace(/_/g, '-').toLowerCase();
     }
 
-    // Detects specific Japanese voice personas or novelty voices without blocking
-    // English voices whose display names are localized by a Japanese OS (e.g. "Samantha (英語（米国）)")
+    // Strictly blocks any Japanese or non-English voice persona
     function isBlockedVoicePersona(voice) {
       if (!voice) return true;
       const lang = normalizeLangTag(voice.lang);
       const name = String(voice.name || '');
 
-      // If the voice language tag is explicitly non-English (e.g. 'ja-jp', 'zh-cn', 'ko-kr'), block it
-      if (lang && !lang.startsWith('en')) return true;
+      // Must explicitly have an English ('en' or 'en-*') language tag
+      if (!lang || !lang.startsWith('en')) return true;
 
-      // Block known Japanese TTS persona names (in Latin or Kana) even if a browser mislabels their lang
-      const japanesePersonaNames = /kyoko|otoya|hattori|haruka|ichiro|ayumi|sayaka|nanami|keita|mayu|naoki|きょうこ|おとや|はるか|いちろう|あゆみ|さやか|ななみ|けいた/i;
+      // Block any voice whose name mentions Japanese or 日本語
+      if (/japanese|japan|日本語|にほんご/i.test(name)) return true;
+
+      // Block known Japanese TTS persona names (in Latin or Kana/Kanji)
+      const japanesePersonaNames = /kyoko|otoya|hattori|haruka|ichiro|ayumi|sayaka|nanami|keita|mayu|naoki|daichi|shiori|takumi|mizuki|kaho|seiji|osamu|junko|akemi|hikari|takeru|misaki|show|hoya|fujitsu|toshiba|きょうこ|おとや|はるか|いちろう|あゆみ|さやか|ななみ|けいた/i;
       if (japanesePersonaNames.test(name)) return true;
+
+      // If the voice name contains any Japanese characters (Kana/Kanji), ONLY allow it if
+      // the OS localized the word "English" as "英語" (e.g. "Microsoft Zira - 英語 (米国)")
+      const hasJapaneseScript = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uff66-\uff9f]/.test(name);
+      if (hasJapaneseScript && !/英語/.test(name)) {
+        return true;
+      }
 
       // Block Apple macOS/iOS novelty sound-effect voices that report 'en-US'
       const noveltyVoices = /\b(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|good news|hysterical|jester|organ|pipe organ|superstar|trinoids|whisper|wobble|zarvox)\b/i;
@@ -525,7 +567,9 @@
       }
     }
 
-    // Native Web Speech API speaker (called synchronously within user tap/click!)
+    // Native Web Speech API speaker
+    // CRITICAL PC GUARD: On Desktop PCs, if no verified English voice object exists, NEVER call speechSynthesis.speak()
+    // so Windows SAPI can NEVER fall back to Microsoft Haruka / Japanese TTS!
     function speakWithNativeWebSpeech(text, myToken, onEndCallback, chosenVoice) {
       let callbackFired = false;
       let backupTimer = null;
@@ -548,9 +592,37 @@
         return;
       }
 
+      const desktopMode = isDesktopPC();
+      const verifiedVoice = chosenVoice || selectBestAmericanEnglishVoice();
+
+      // If on a Desktop PC and no verified English voice is available yet, wait briefly for getVoices()
+      // and if still unavailable, DO NOT trigger the OS default Japanese voice!
+      if (desktopMode && !verifiedVoice) {
+        let attempts = 0;
+        const pollTimer = setInterval(() => {
+          if (myToken !== activeSpeechToken || callbackFired) {
+            clearInterval(pollTimer);
+            return;
+          }
+          attempts++;
+          const lateVoice = selectBestAmericanEnglishVoice();
+          if (lateVoice) {
+            clearInterval(pollTimer);
+            if (backupTimer) clearTimeout(backupTimer);
+            speakWithNativeWebSpeech(text, myToken, onEndCallback, lateVoice);
+          } else if (attempts >= 8) {
+            clearInterval(pollTimer);
+            // Refuse to call speechSynthesis.speak() on Desktop without a verified English voice
+            updateVoiceButtonTooltip('No English OS Voice Installed (Blocked Japanese OS Fallback)');
+          }
+        }, 55);
+        return;
+      }
+
       try {
+        const isRemoteGoogleVoice = verifiedVoice && /google/i.test(verifiedVoice.name) && verifiedVoice.localService === false;
         const wasSpeaking = window.speechSynthesis.speaking || window.speechSynthesis.pending;
-        if (wasSpeaking) {
+        if (wasSpeaking && !isRemoteGoogleVoice) {
           window.speechSynthesis.cancel();
         }
         if (window.speechSynthesis.paused) {
@@ -559,12 +631,18 @@
 
         const startUtterance = () => {
           if (myToken !== activeSpeechToken || callbackFired) return;
+          const voiceToUse = verifiedVoice || selectBestAmericanEnglishVoice();
+
+          // Double-check Desktop PC guard right before speaking
+          if (desktopMode && !voiceToUse) {
+            return;
+          }
+
           const utter = new SpeechSynthesisUtterance(text);
           window._activeUtterance = utter;
 
           // Always set utter.lang = 'en-US' BEFORE utter.voice
           utter.lang = 'en-US';
-          const voiceToUse = chosenVoice || selectBestAmericanEnglishVoice();
           if (voiceToUse) {
             utter.voice = voiceToUse;
             updateVoiceButtonTooltip(`US Voice: ${voiceToUse.name}`);
@@ -581,9 +659,7 @@
           window.speechSynthesis.speak(utter);
         };
 
-        // If we just called cancel(), a tiny 30ms delay prevents Chrome on Windows/Android
-        // from accidentally canceling the new utterance while keeping the user-gesture active
-        if (wasSpeaking) {
+        if (wasSpeaking && !isRemoteGoogleVoice) {
           speechQueueTimer = setTimeout(startUtterance, 30);
         } else {
           startUtterance();
@@ -593,10 +669,12 @@
       }
     }
 
-    // Cloud Native American English (en-US) Fallback for Japanese Windows PCs that have ZERO English voices installed
-    function playCloudAmericanTTSFallback(text, myToken, onEndCallback) {
+    // Primary Cloud Native American English (en-US) Streamer for Desktop PCs (and fallback for devices without English TTS)
+    // Uses persistent <audio> to stream real American English audio from Youdao (type=2 US) and Google (en-US)
+    function playCloudAmericanTTSStream(text, myToken, onEndCallback) {
       const player = getPersistentAudioPlayer();
       stopPersistentAudioPlayer();
+      player.muted = false;
 
       let callbackFired = false;
       let backupTimer = null;
@@ -618,12 +696,12 @@
       const encoded = encodeURIComponent(text);
       const cloudUrls = [
         {
-          url: `https://translate.googleapis.com/translate_tts?ie=UTF-8&tl=en-US&client=gtx&q=${encoded}`,
-          label: 'Cloud American English (Google en-US)'
-        },
-        {
           url: `https://dict.youdao.com/dictvoice?type=2&audio=${encoded}`,
           label: 'Cloud American English (Youdao en-US)'
+        },
+        {
+          url: `https://translate.googleapis.com/translate_tts?ie=UTF-8&tl=en-US&client=gtx&q=${encoded}`,
+          label: 'Cloud American English (Google en-US)'
         }
       ];
 
@@ -632,13 +710,16 @@
       const tryNextCloudStream = () => {
         if (myToken !== activeSpeechToken || callbackFired) return;
 
-        // If cloud streams are blocked by firewall/offline, fall back to standard en-US Web Speech utterance
+        // If offline or both cloud streams are blocked, fall back ONLY to a verified English voice (never null on PC!)
         if (urlIdx >= cloudUrls.length) {
-          if (backupTimer) {
-            clearTimeout(backupTimer);
-            backupTimer = null;
+          const verifiedVoice = selectBestAmericanEnglishVoice();
+          if (verifiedVoice) {
+            if (backupTimer) {
+              clearTimeout(backupTimer);
+              backupTimer = null;
+            }
+            speakWithNativeWebSpeech(text, myToken, onEndCallback, verifiedVoice);
           }
-          speakWithNativeWebSpeech(text, myToken, onEndCallback, null);
           return;
         }
 
@@ -648,8 +729,8 @@
           player.onerror = () => tryNextCloudStream();
 
           player.src = currentSource.url;
-          player.playbackRate = 0.90;
-          player.defaultPlaybackRate = 0.90;
+          player.playbackRate = 0.92;
+          player.defaultPlaybackRate = 0.92;
 
           const playPromise = player.play();
           if (playPromise !== undefined) {
@@ -765,20 +846,28 @@
 
       isAudioSpeaking = true;
 
+      // DESKTOP PC PATH (Windows / Mac / Linux):
+      // Always use the Dual-Engine Cloud American English (en-US) stream first so Japanese Windows PCs
+      // NEVER use local Japanese SAPI voices, and fall back only to a verified English voice if offline.
+      if (isDesktopPC()) {
+        if ('speechSynthesis' in window) {
+          try { window.speechSynthesis.cancel(); } catch (e) {}
+        }
+        playCloudAmericanTTSStream(text, myToken, onEndCallback);
+        return;
+      }
+
+      // MOBILE & TABLET PATH (iOS, iPadOS, Android):
+      // Keep the fast, synchronous native Web Speech path that works great on smartphones and tablets.
       const voices = ('speechSynthesis' in window) ? window.speechSynthesis.getVoices() : [];
       const usVoice = selectBestAmericanEnglishVoice();
 
-      // Case 1: Device has a verified American/English voice (iOS, iPadOS, macOS, Android, most PCs)
-      // OR voices[] hasn't finished initial population yet on first mobile tap (voices.length === 0):
-      // Speak IMMEDIATELY inside the user gesture via Web Speech API!
       if (usVoice || voices.length === 0) {
         speakWithNativeWebSpeech(text, myToken, onEndCallback, usVoice);
         return;
       }
 
-      // Case 2: voices.length > 0, and ZERO English voices exist on this machine (e.g., a Japanese Windows PC
-      // with only Haruka/Ichiro installed): stream Cloud American English (en-US) synchronously!
-      playCloudAmericanTTSFallback(text, myToken, onEndCallback);
+      playCloudAmericanTTSStream(text, myToken, onEndCallback);
     }
 
     function toggleVoice() {
@@ -1744,16 +1833,16 @@
         headwear: null
       };
       characterReaction = lvl.type === 'dressup' ? getDefaultWeatherReaction(lvl.weatherKey) : 'normal';
-      feedbackMessage = null;
-      hasFailedCurrentLevel = false;
-      thoughtBubbleVisible = false;
-      activeVocabBannerHTML = null;
-
-      // Update stage sky & ground colors
+      // Update stage sky & ground colors (Raise ground height on smartphones during Dress-Up levels so character isn't floating!)
       const stageWrapper = document.getElementById('stageWrapper');
       const groundLayer = document.getElementById('groundLayer');
       if (stageWrapper) stageWrapper.style.backgroundColor = lvl.skyColor;
-      if (groundLayer) groundLayer.style.backgroundColor = lvl.groundColor;
+      if (groundLayer) {
+        groundLayer.style.backgroundColor = lvl.groundColor;
+        groundLayer.className = lvl.type === 'dressup'
+          ? 'absolute bottom-0 left-0 right-0 h-[295px] sm:h-28 border-t-4 border-gray-900 z-0 transition-all duration-500'
+          : 'absolute bottom-0 left-0 right-0 h-16 sm:h-28 border-t-4 border-gray-900 z-0 transition-all duration-500';
+      }
 
       renderNavigation();
       updateStarCounter();
@@ -1808,9 +1897,9 @@
       const sky = document.getElementById('weatherSkyLayer');
       if (!sky) return;
 
-      // Tree on the left for Dress-Up levels (sways on windy level)
+      // Tree on the left for Dress-Up levels (Raised on smartphones to match the character's ground level; unchanged sm:bottom-20 on Tablet/PC)
       const treeSVG = lvl.type === 'dressup' ? `
-        <svg viewBox="0 0 260 460" class="absolute -left-12 sm:-left-6 bottom-16 sm:bottom-20 w-48 sm:w-64 h-auto pointer-events-none opacity-95 ${lvl.weatherKey === 'windy' ? 'tree-wind-sway' : ''}">
+        <svg viewBox="0 0 260 460" class="absolute -left-10 sm:-left-6 bottom-[285px] sm:bottom-20 w-40 sm:w-64 h-auto pointer-events-none opacity-95 ${lvl.weatherKey === 'windy' ? 'tree-wind-sway' : ''}">
           <!-- Tree Trunk -->
           <path d="M88,450 Q105,340 102,240 L72,195 L86,182 L108,212 L114,175 L134,175 L134,220 L166,185 L180,200 L142,245 Q140,340 162,450 Z"
                 fill="#92400E" stroke="#111827" stroke-width="5" stroke-linejoin="round"/>
@@ -1847,7 +1936,7 @@
         const splashes = Array.from({ length: 8 }).map((_, i) => {
           const left = 10 + (i * 10.5) % 82;
           const delay = (i * 0.21) % 0.85;
-          return `<div class="rain-splash absolute bottom-[78px] sm:bottom-[92px] w-8 h-2.5 rounded-full border-2 border-sky-200 bg-sky-300/50" style="left:${left}%; animation-delay:${delay}s;"></div>`;
+          return `<div class="rain-splash absolute bottom-[300px] sm:bottom-[92px] w-8 h-2.5 rounded-full border-2 border-sky-200 bg-sky-300/50" style="left:${left}%; animation-delay:${delay}s;"></div>`;
         }).join('');
         weatherDecor = `
           <!-- Heavy Dark Rain Clouds Across Top (Fluffy Multi-Puff SVG Clouds) -->
@@ -1898,8 +1987,8 @@
                     fill="#FFFFFF" stroke="#475569" stroke-width="4.5" stroke-linejoin="round"/>
             </svg>
           </div>
-          <!-- Snowdrifts on Ground -->
-          <div class="absolute bottom-[74px] sm:bottom-[88px] left-0 right-0 flex justify-between pointer-events-none">
+          <!-- Snowdrifts on Ground (Raised on smartphones to match character horizon; unchanged sm:bottom-[88px] on Tablet/PC) -->
+          <div class="absolute bottom-[288px] sm:bottom-[88px] left-0 right-0 flex justify-between pointer-events-none">
             <div class="w-64 h-12 bg-white rounded-t-full border-t-4 border-gray-900"></div>
             <div class="w-80 h-14 bg-white rounded-t-full border-t-4 border-gray-900"></div>
             <div class="w-72 h-12 bg-white rounded-t-full border-t-4 border-gray-900"></div>

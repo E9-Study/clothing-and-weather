@@ -366,17 +366,15 @@
   <!-- COMPLETE APPLICATION LOGIC & SVG ARTWORK LIBRARY -->
   <script>
     /*************************************************************************
-     * 1. DUAL-ENGINE NATIVE AMERICAN ENGLISH (en-US) SPEECH & SOUND SYSTEM
-     *    - Primary Engine (Cloud Native en-US Audio Stream): Uses a persistent
-     *      <audio> player to stream real American English (en-US) audio with
-     *      automatic failover across Youdao (type=2 American English) and
-     *      Google en-US TTS so a Japanese Windows/Mac OS can never substitute
-     *      a Japanese system voice.
-     *    - Offline Fallback Engine (Hardened Desktop speechSynthesis): If
-     *      offline, sets utter.lang BEFORE utter.voice, avoids aborting Chrome's
-     *      remote Google US English voice, blocks Japanese script voice names
-     *      (はるか, あゆみ, きょうこ, etc.), and refuses to trigger the Japanese
-     *      OS default voice when no English voice is installed.
+     * 1. CROSS-PLATFORM AMERICAN ENGLISH (en-US) SPEECH & SOUND SYSTEM
+     *    - Works on iOS, iPadOS, macOS, Android, and Windows PCs (even when
+     *      the device OS language is set to Japanese!).
+     *    - Allows English voices whose OS display name is localized in Japanese
+     *      (e.g. "英語 (米国)" / "アメリカ合衆国") while blocking Japanese
+     *      persona voices (Haruka, Kyoko, Otoya, Ichiro, Ayumi, etc.).
+     *    - Calls speechSynthesis synchronously within user gestures so mobile
+     *      browsers never block audio playback, and uses Cloud en-US audio
+     *      automatically if a Windows PC has zero English voices installed.
      *************************************************************************/
     let voiceEnabled = true;
     let audioCtx = null;
@@ -411,42 +409,41 @@
       return String(lang || '').trim().replace(/_/g, '-').toLowerCase();
     }
 
-    // Detects any Japanese Hiragana, Katakana, Kanji, or known non-English voice names
-    function isBlockedNonEnglishVoice(voice) {
+    // Detects specific Japanese voice personas or novelty voices without blocking
+    // English voices whose display names are localized by a Japanese OS (e.g. "Samantha (英語（米国）)")
+    function isBlockedVoicePersona(voice) {
       if (!voice) return true;
       const lang = normalizeLangTag(voice.lang);
       const name = String(voice.name || '');
 
-      // Block any voice containing Japanese script (はるか, あゆみ, きょうこ, いちろう, etc.) or CJK characters
-      const japaneseOrCJKScript = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uff66-\uff9f]/;
-      if (japaneseOrCJKScript.test(name)) return true;
+      // If the voice language tag is explicitly non-English (e.g. 'ja-jp', 'zh-cn', 'ko-kr'), block it
+      if (lang && !lang.startsWith('en')) return true;
 
-      // Block known Japanese & non-English system voice identifiers
-      const blockedVoiceNames = /kyoko|otoya|hattori|haruka|ichiro|ayumi|sayaka|nanami|keita|mayu|naoki|siri.*japanese|japanese|nihongo|ja[-_]|huihui|yaoyao|kangkang|ting-ting|sin-ji|mei-jia|heami|yuna|paulina|sabina|helena|hortense|hedda|katja|elsa|cosimo/i;
-      if (blockedVoiceNames.test(name) || blockedVoiceNames.test(lang)) return true;
+      // Block known Japanese TTS persona names (in Latin or Kana) even if a browser mislabels their lang
+      const japanesePersonaNames = /kyoko|otoya|hattori|haruka|ichiro|ayumi|sayaka|nanami|keita|mayu|naoki|きょうこ|おとや|はるか|いちろう|あゆみ|さやか|ななみ|けいた/i;
+      if (japanesePersonaNames.test(name)) return true;
 
-      // Block Apple macOS/iOS novelty/robotic sound-effect voices that report 'en-US'
+      // Block Apple macOS/iOS novelty sound-effect voices that report 'en-US'
       const noveltyVoices = /\b(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|good news|hysterical|jester|organ|pipe organ|superstar|trinoids|whisper|wobble|zarvox)\b/i;
       if (noveltyVoices.test(name)) return true;
 
       return false;
     }
 
-    // Strict check for whether a local/browser voice is genuinely American English (en-US)
+    // Checks if an English voice is specifically American English (en-US)
     function isAmericanEnglishVoice(voice) {
-      if (!voice || isBlockedNonEnglishVoice(voice)) return false;
+      if (!voice || isBlockedVoicePersona(voice)) return false;
       const lang = normalizeLangTag(voice.lang);
       const name = String(voice.name || '');
 
-      // Block explicit UK, Australian, Irish, Indian, South African voice names even if mislabeled
-      const nonUSAccentNames = /\b(united kingdom|great britain|british|uk english|australian|ireland|irish|indian|south africa|scottish|daniel|serena|oliver|kate|stephanie|fiona|moira|karen|lee|catherine|gordon|tessa|rishi|veena|sangeeta|hazel|george|susan|libby|sonia|ryan|thomas)\b/i;
+      // Exclude known UK, Australian, Irish, Indian, South African voice personas when searching for US voices
+      const nonUSAccentNames = /\b(united kingdom|great britain|british|uk english|australian|ireland|irish|indian|south africa|scottish|daniel|serena|oliver|kate|stephanie|fiona|moira|karen|lee|catherine|gordon|tessa|rishi|veena|sangeeta|hazel|george|susan|libby|sonia|ryan|thomas)\b|イギリス|オーストラリア|インド/i;
       if (nonUSAccentNames.test(name)) {
         return false;
       }
 
-      // Match standard en-US language tag or explicit US English voice description
-      const isUSTag = lang === 'en-us' || lang.startsWith('en-us-');
-      const isExplicitUSName = /united states|us english|\b(samantha|ava|allison|nicky|zira|david|mark|aria|jenny|guy|ana|steffan|christopher|eric|michelle|roger)\b/i.test(name) && lang.startsWith('en');
+      const isUSTag = lang === 'en-us' || lang.startsWith('en-us-') || lang.includes('us');
+      const isExplicitUSName = /united states|us english|米国|アメリカ|\b(samantha|ava|allison|nicky|zira|david|mark|aria|jenny|guy|ana|steffan|christopher|eric|michelle|roger|alex)\b/i.test(name);
 
       return isUSTag || isExplicitUSName;
     }
@@ -460,14 +457,14 @@
       if (lang === 'en-us' || lang.startsWith('en-us-')) score += 50;
 
       const topTierPatterns = [
-        { pattern: /microsoft (aria|jenny|ana) online.*natural.*united states/i, bonus: 120 },
+        { pattern: /microsoft (aria|jenny|ana) online.*natural/i, bonus: 120 },
         { pattern: /google us english/i, bonus: 115 },
         { pattern: /\b(ava|allison|samantha|nicky)\b.*(enhanced|premium)/i, bonus: 112 },
         { pattern: /\bsamantha\b/i, bonus: 105 },
         { pattern: /\b(ava|nicky|allison)\b/i, bonus: 100 },
         { pattern: /microsoft (aria|jenny|ana|zira)/i, bonus: 95 },
         { pattern: /en-us-x-(sfg|tpf|iob|iom)/i, bonus: 90 },
-        { pattern: /united states|us english/i, bonus: 80 },
+        { pattern: /united states|us english|米国|アメリカ/i, bonus: 80 },
         { pattern: /\b(victoria|kathy|vicki|alex|tom|evan|nathan|aaron)\b/i, bonus: 70 },
         { pattern: /microsoft (david|mark|guy|christopher|eric|steffan)/i, bonus: 65 }
       ];
@@ -491,7 +488,7 @@
       const voices = window.speechSynthesis.getVoices();
       if (!voices || voices.length === 0) return null;
 
-      // 1. Filter strictly for verified American English (en-US) voices
+      // 1. Priority 1: Strictly verified American English (en-US) voices
       const usVoices = voices.filter(isAmericanEnglishVoice);
       if (usVoices.length > 0) {
         usVoices.sort((a, b) => scoreAmericanVoice(b) - scoreAmericanVoice(a));
@@ -499,18 +496,14 @@
         return preferredUSVoice;
       }
 
-      // 2. Secondary fallback: Any verified English voice that is NOT a blocked Japanese/CJK voice
-      const fallbackEngVoices = voices.filter(v => {
-        const lang = normalizeLangTag(v.lang);
-        return lang.startsWith('en') && !isBlockedNonEnglishVoice(v);
-      });
-
+      // 2. Priority 2: Any verified English (en-*) voice (never Japanese)
+      const fallbackEngVoices = voices.filter(v => !isBlockedVoicePersona(v));
       if (fallbackEngVoices.length > 0) {
         preferredUSVoice = fallbackEngVoices[0];
         return preferredUSVoice;
       }
 
-      // 3. No English voice installed on this OS
+      // 3. No English voice found in getVoices()
       preferredUSVoice = null;
       return null;
     }
@@ -522,7 +515,7 @@
       }
     }
 
-    // Initialize voice list listener for offline fallback
+    // Pre-warm voice list on load and whenever browser finishes loading voices
     if ('speechSynthesis' in window) {
       selectBestAmericanEnglishVoice();
       if (window.speechSynthesis.onvoiceschanged !== undefined) {
@@ -532,8 +525,8 @@
       }
     }
 
-    // OFFLINE FALLBACK ENGINE: Hardened Desktop/Mobile speechSynthesis
-    function speakWithHardenedDesktopTTS(text, myToken, onEndCallback) {
+    // Native Web Speech API speaker (called synchronously within user tap/click!)
+    function speakWithNativeWebSpeech(text, myToken, onEndCallback, chosenVoice) {
       let callbackFired = false;
       let backupTimer = null;
 
@@ -555,47 +548,53 @@
         return;
       }
 
-      const usVoice = selectBestAmericanEnglishVoice();
-
-      // CRITICAL GUARD: Refuse to trigger the Japanese OS default voice when no English voice is installed
-      if (!usVoice) {
-        updateVoiceButtonTooltip('No offline en-US voice installed (Japanese OS voice blocked)');
-        return;
-      }
-
       try {
-        // Avoid calling cancel() on Chrome's remote Google US English voice (localService === false)
-        // unless speech is actively stuck, as Chrome aborts remote network utterances after cancel()
-        const isRemoteVoice = usVoice.localService === false || /google/i.test(usVoice.name);
-        if (!isRemoteVoice && (window.speechSynthesis.speaking || window.speechSynthesis.pending)) {
+        const wasSpeaking = window.speechSynthesis.speaking || window.speechSynthesis.pending;
+        if (wasSpeaking) {
           window.speechSynthesis.cancel();
         }
         if (window.speechSynthesis.paused) {
           window.speechSynthesis.resume();
         }
 
-        const utter = new SpeechSynthesisUtterance(text);
-        window._activeUtterance = utter;
+        const startUtterance = () => {
+          if (myToken !== activeSpeechToken || callbackFired) return;
+          const utter = new SpeechSynthesisUtterance(text);
+          window._activeUtterance = utter;
 
-        // IMPORTANT: Set utter.lang BEFORE utter.voice so Chromium/Windows does not reset utter.voice
-        utter.lang = 'en-US';
-        utter.voice = usVoice;
-        utter.rate = 0.84; // Clear A1-A2 beginner pace
-        utter.pitch = 1.04;
+          // Always set utter.lang = 'en-US' BEFORE utter.voice
+          utter.lang = 'en-US';
+          const voiceToUse = chosenVoice || selectBestAmericanEnglishVoice();
+          if (voiceToUse) {
+            utter.voice = voiceToUse;
+            updateVoiceButtonTooltip(`US Voice: ${voiceToUse.name}`);
+          } else {
+            updateVoiceButtonTooltip('US Voice: Default en-US');
+          }
 
-        updateVoiceButtonTooltip(`Offline US Voice: ${usVoice.name}`);
+          utter.rate = 0.84; // Clear A1-A2 beginner pace
+          utter.pitch = 1.04;
 
-        utter.onend = () => setTimeout(done, 140);
-        utter.onerror = () => setTimeout(done, 180);
+          utter.onend = () => setTimeout(done, 140);
+          utter.onerror = () => setTimeout(done, 180);
 
-        window.speechSynthesis.speak(utter);
+          window.speechSynthesis.speak(utter);
+        };
+
+        // If we just called cancel(), a tiny 30ms delay prevents Chrome on Windows/Android
+        // from accidentally canceling the new utterance while keeping the user-gesture active
+        if (wasSpeaking) {
+          speechQueueTimer = setTimeout(startUtterance, 30);
+        } else {
+          startUtterance();
+        }
       } catch (e) {
         setTimeout(done, 300);
       }
     }
 
-    // PRIMARY ENGINE: Cloud Native American English (en-US) Audio Stream via Persistent <audio> Player
-    function playPrimaryCloudAmericanTTS(text, myToken, onEndCallback) {
+    // Cloud Native American English (en-US) Fallback for Japanese Windows PCs that have ZERO English voices installed
+    function playCloudAmericanTTSFallback(text, myToken, onEndCallback) {
       const player = getPersistentAudioPlayer();
       stopPersistentAudioPlayer();
 
@@ -617,17 +616,14 @@
       backupTimer = setTimeout(done, estDuration);
 
       const encoded = encodeURIComponent(text);
-      // Failover chain of real American English (en-US) cloud voice streams:
-      // 1. Youdao DictVoice (type=2 is strictly American English en-US, high compatibility across Asia/Japan)
-      // 2. Google Translate TTS (tl=en-US with no-referrer)
       const cloudUrls = [
+        {
+          url: `https://translate.googleapis.com/translate_tts?ie=UTF-8&tl=en-US&client=gtx&q=${encoded}`,
+          label: 'Cloud American English (Google en-US)'
+        },
         {
           url: `https://dict.youdao.com/dictvoice?type=2&audio=${encoded}`,
           label: 'Cloud American English (Youdao en-US)'
-        },
-        {
-          url: `https://translate.googleapis.com/translate_tts?ie=UTF-8&tl=en-US&client=tw-ob&q=${encoded}`,
-          label: 'Cloud American English (Google en-US)'
         }
       ];
 
@@ -636,39 +632,30 @@
       const tryNextCloudStream = () => {
         if (myToken !== activeSpeechToken || callbackFired) return;
 
-        // If all cloud endpoints failed (e.g., computer is offline or school firewall blocks streaming),
-        // seamlessly switch to the Hardened Offline speechSynthesis Engine!
+        // If cloud streams are blocked by firewall/offline, fall back to standard en-US Web Speech utterance
         if (urlIdx >= cloudUrls.length) {
           if (backupTimer) {
             clearTimeout(backupTimer);
             backupTimer = null;
           }
-          speakWithHardenedDesktopTTS(text, myToken, onEndCallback);
+          speakWithNativeWebSpeech(text, myToken, onEndCallback, null);
           return;
         }
 
         const currentSource = cloudUrls[urlIdx++];
         try {
-          player.onended = () => {
-            setTimeout(done, 140);
-          };
-          player.onerror = () => {
-            tryNextCloudStream();
-          };
+          player.onended = () => setTimeout(done, 140);
+          player.onerror = () => tryNextCloudStream();
 
           player.src = currentSource.url;
-          player.playbackRate = 0.90; // Slightly slower for A1-A2 ESL beginners
+          player.playbackRate = 0.90;
           player.defaultPlaybackRate = 0.90;
 
           const playPromise = player.play();
           if (playPromise !== undefined) {
             playPromise
-              .then(() => {
-                updateVoiceButtonTooltip(currentSource.label);
-              })
-              .catch(() => {
-                tryNextCloudStream();
-              });
+              .then(() => updateVoiceButtonTooltip(currentSource.label))
+              .catch(() => tryNextCloudStream());
           }
         } catch (err) {
           tryNextCloudStream();
@@ -778,15 +765,20 @@
 
       isAudioSpeaking = true;
 
-      // If browser reports it is offline, go straight to Hardened Offline speechSynthesis
-      if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-        speakWithHardenedDesktopTTS(text, myToken, onEndCallback);
+      const voices = ('speechSynthesis' in window) ? window.speechSynthesis.getVoices() : [];
+      const usVoice = selectBestAmericanEnglishVoice();
+
+      // Case 1: Device has a verified American/English voice (iOS, iPadOS, macOS, Android, most PCs)
+      // OR voices[] hasn't finished initial population yet on first mobile tap (voices.length === 0):
+      // Speak IMMEDIATELY inside the user gesture via Web Speech API!
+      if (usVoice || voices.length === 0) {
+        speakWithNativeWebSpeech(text, myToken, onEndCallback, usVoice);
         return;
       }
 
-      // Primary Engine: Stream real American English (en-US) cloud audio immediately
-      // (with automatic failover to Hardened Offline speechSynthesis if stream is blocked)
-      playPrimaryCloudAmericanTTS(text, myToken, onEndCallback);
+      // Case 2: voices.length > 0, and ZERO English voices exist on this machine (e.g., a Japanese Windows PC
+      // with only Haruka/Ichiro installed): stream Cloud American English (en-US) synchronously!
+      playCloudAmericanTTSFallback(text, myToken, onEndCallback);
     }
 
     function toggleVoice() {
